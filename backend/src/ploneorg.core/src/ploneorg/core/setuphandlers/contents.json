@@ -1,0 +1,75 @@
+[
+  {
+    "_parent": "",
+    "type": "Folder",
+    "id": "images",
+    "title": "Images",
+    "description": "Image Bank.",
+    "_transitions": [
+      "publish"
+    ],
+    "_allowed_types": [
+      "Image"
+    ],
+    "exclude_from_nav": true
+  },
+  {
+    "_parent": "images",
+    "type": "Image",
+    "id": "plone-foundation.png",
+    "title": "Plone Foundation Logo",
+    "description": "",
+    "_image": "images/plone-foundation.png",
+    "_transitions": [],
+    "exclude_from_nav": false
+  },
+  {
+    "_parent": "",
+    "type": "Document",
+    "id": "foundation",
+    "title": "Foundation",
+    "description": "The Foundation is a 501(c)(3) non-profit organization that exists to protect and promote Plone.",
+    "blocks": {
+      "17cec173-d436-46ca-8545-35300ffbcb91": {
+        "@type": "title"
+      }
+    },
+    "blocks_layout": {
+      "items": [
+        "17cec173-d436-46ca-8545-35300ffbcb91"
+      ]
+    },
+    "_transitions": [
+      "publish"
+    ],
+    "exclude_from_nav": false
+  },
+  {
+    "_parent": "foundation",
+    "type": "Document",
+    "id": "members",
+    "title": "Members",
+    "description": "Plone Foundation Members.",
+    "blocks": {
+      "35cec973-d436-46ca-8545-35300ffbcb91": {
+        "@type": "title"
+      }
+    },
+    "blocks_layout": {
+      "items": [
+        "35cec973-d436-46ca-8545-35300ffbcb91"
+      ]
+    },
+    "_transitions": [
+      "publish"
+    ],
+    "_permissions": {
+      "ploneorg.core: Add Foundation Member": [
+        "Site Manager",
+        "Manager",
+        "Editor"
+      ]
+    },
+    "exclude_from_nav": false
+  }
+]

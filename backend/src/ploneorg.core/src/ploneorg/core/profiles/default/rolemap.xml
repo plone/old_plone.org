@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<rolemap>
+  <permissions>
+    <!-- -*- extra stuff goes here -*- -->
+    <permission name="ploneorg.core: Add Foundation Member" acquire="False" />
+  </permissions>
+</rolemap>

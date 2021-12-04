@@ -1,0 +1,14 @@
+<configure
+  xmlns="http://namespaces.zope.org/zope"
+  xmlns:browser="http://namespaces.zope.org/browser"
+  xmlns:plone="http://namespaces.plone.org/plone"
+  i18n_domain="ploneorg.core">
+
+  <!-- Publish static files -->
+  <plone:static
+    name="ploneorg.core"
+    type="plone"
+    directory="static"
+  />
+
+</configure>
