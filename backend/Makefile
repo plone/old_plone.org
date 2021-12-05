@@ -236,6 +236,13 @@ lint-isort: ${ISORT_SENTINEL} ## lint code-style isort (sorted imports in Python
 lint: lint-black lint-isort
 
 ##############################################################################
+# CREATE SITE
+.PHONY: create-site
+create-site: ## Create a new site from scratch
+	@echo "$(OK_COLOR)Create a new site$(NO_COLOR)"
+	@${PYBIN}zconsole run instance/etc/zope.conf ./scripts/create_site.py
+
+##############################################################################
 # RUN
 
 .PHONY: run
