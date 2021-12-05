@@ -85,11 +85,11 @@ endif
 
 VENV?=on
 ifeq ("${VENV}", "on")
-VENV_FOLDER?=./venv
-PYBIN=${VENV}/bin
+	VENV_FOLDER?=./venv
+	PYBIN=${VENV_FOLDER}/bin/
 else
-VENV_FOLDER=
-PYBIN=
+	VENV_FOLDER=
+	PYBIN=
 endif
 
 VENV_SENTINEL=${SENTINELFOLDER}venv.sentinel
