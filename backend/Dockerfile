@@ -8,4 +8,4 @@ LABEL maintainer="Plone Foundation <marketing@plone.org>" \
 
 # Add local code
 COPY . ./
-RUN gosu plone ./bin/pip install -r requirements.txt
+RUN gosu make install

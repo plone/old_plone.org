@@ -1,2 +1,6 @@
--r requirements/unreleased.txt
-src/ploneorg.core
+-c constraints.txt
+-e src/ploneorg.core[test]
+# WSGI not included
+Paste
+# we want the whole package
+Plone
