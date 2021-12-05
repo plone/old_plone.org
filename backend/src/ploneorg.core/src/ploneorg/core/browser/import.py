@@ -141,6 +141,15 @@ class PloneOrgImportContent(ImportContent):
         if item["@type"] not in self.IMPORTED_TYPES:
             return
 
+        lang = item.pop("language", None)
+        if lang is not None:
+            item["language"] = "en"
+
+        # disable mosaic remote view
+        if item.get("layout") == "layout_view":
+            logger.info(f"Drop mosaic layout from {item['@id']}")
+            item.pop("layout")
+
         # drop empty creator
         item["creators"] = [i for i in item.get("creators", []) if i]
 
