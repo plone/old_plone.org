@@ -1,0 +1,13 @@
+/*Footer*/
+#footer {
+  .ui.grid {
+    .ui.list {
+      .header {
+        font-weight: @bold;
+        a {
+          color: @white;
+        }
+      }
+    }
+  }
+}
