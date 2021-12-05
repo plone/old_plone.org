@@ -78,12 +78,12 @@ class ImportAll(BrowserView):
         logger.info(results)
         transaction.commit()
 
-        name = "portlets"
-        view = api.content.get_view(f"import_{name}", portal, request)
-        path = Path(directory) / f"export_{name}.json"
-        results = view(jsonfile=path.read_text(), return_json=True)
-        logger.info(results)
-        transaction.commit()
+        # name = "portlets"
+        # view = api.content.get_view(f"import_{name}", portal, request)
+        # path = Path(directory) / f"export_{name}.json"
+        # results = view(jsonfile=path.read_text(), return_json=True)
+        # logger.info(results)
+        # transaction.commit()
 
         name = "zope_users"
         view = api.content.get_view(f"import_{name}", portal, request)
