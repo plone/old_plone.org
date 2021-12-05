@@ -88,7 +88,7 @@ ifeq ("${VENV}", "on")
 	VENV_FOLDER?=./venv
 	PYBIN=${VENV_FOLDER}/bin/
 else
-	VENV_FOLDER=
+	VENV_FOLDER?=
 	PYBIN=
 endif
 
