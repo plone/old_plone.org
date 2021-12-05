@@ -32,8 +32,8 @@ jobs:
 
       - name: Install package
         run: |
-          make install
+          make VENV=off install
 
       - name: Run tests
         run: |
-          make test-ignore-warnings
+          make VENV=off test-ignore-warnings

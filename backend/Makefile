@@ -70,6 +70,7 @@ ${SENTINEL}:
 
 # PYTHON, VENV, PIP
 # installed?
+
 PYTHON=python3
 ifeq (, $(shell which python ))
   $(error "PYTHON=$(PYTHON) not found in $(PATH)")
@@ -82,14 +83,27 @@ ifeq ($(PYTHON_VERSION_OK),0)
   $(error "Need python $(PYTHON_VERSION) >= $(PYTHON_VERSION_MIN)")
 endif
 
-PYBIN=./venv/bin/
-VENV=${PYBIN}python
-${VENV}:
-	@echo "$(OK_COLOR)Setup Python Virtual Environment under './venv' $(NO_COLOR)"
-	@${PYTHON} -m venv venv
+VENV?=on
+ifeq ("${VENV}", "on")
+VENV_FOLDER?=./venv
+PYBIN=${VENV}/bin
+else
+VENV_FOLDER=
+PYBIN=
+endif
+
+VENV_SENTINEL=${SENTINELFOLDER}venv.sentinel
+${VENV_SENTINEL}: ${SENTINEL}
+ifeq ("${VENV}", "on")
+	@echo "$(OK_COLOR)Setup Python Virtual Environment under '${VENV_FOLDER}' $(NO_COLOR)"
+	@${PYTHON} -m venv ${VENV_FOLDER}
+else
+	@echo "$(OK_COLOR)Use current local or global Python: `which ${PYTHON}` $(NO_COLOR)"
+endif
+	@touch ${VENV_SENTINEL}
 
 PIP_SENTINEL=${SENTINELFOLDER}pip.sentinel
-${PIP_SENTINEL}: ${VENV} ${CONSTRAINTS} ${SENTINEL}
+${PIP_SENTINEL}: ${VENV_SENTINEL} ${CONSTRAINTS} ${SENTINEL}
 	@echo "$(OK_COLOR)Install pip according to ${CONSTRAINTS}$(NO_COLOR)"
 	@${PYBIN}pip install -c ${CONSTRAINTS} pip wheel
 	@touch ${PIP_SENTINEL}
@@ -233,7 +247,12 @@ run: ${RUN_PREREQUISITES} ## run/start Plone
 # CLEAN
 .PHONY: clean-venv
 clean-venv: ## remove Python virtual environment
-	rm -rf ./venv ${SENTINELFOLDER}/pip*.sentinel
+ifneq ("(wildcard ${VENV_FOLDER})", "")
+	@echo "$(OK_COLOR)Remove Virtualenv.$(NO_COLOR)"
+	rm -rf ${VENV_FOLDER} ${SENTINELFOLDER}/pip*.sentinel
+else:
+	@echo "$(OK_WARN)No Python virtualenv at '${VENV_FOLDER}'! Nothing to do.$(NO_COLOR)"
+endif
 
 .PHONY: clean-pyc
 clean-pyc: ## remove Python file artifacts
