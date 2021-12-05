@@ -1777,7 +1777,7 @@
     pofile "1.0.10"
     razzle "3.4.5"
 
-"@plone/volto@14.0.0.alpha.40":
+"@plone/volto@14.0.0-alpha.40":
   version "14.0.0-alpha.40"
   resolved "https://registry.yarnpkg.com/@plone/volto/-/volto-14.0.0-alpha.40.tgz#afc9e2e5a3261c5ca8e5b38106d0ade98f8afe96"
   integrity sha512-E/xOdFQibz+N53Way0mQMmpnitx/HCPMV29Ae/ldgPsGD3J/F+2pkVqL7D7urICkd3Bq9jXZUIOhLfENx3s2xw==
