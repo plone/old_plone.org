@@ -120,7 +120,27 @@ class PloneOrgImportContent(ImportContent):
 
     DROP_UIDS = []
 
+    IMPORTED_TYPES = [
+        "Collection",
+        "Document",
+        "Event",
+        "File",
+        "Folder",
+        "Image",
+        "Link",
+        "News Item",
+        # "FoundationMember",
+        # "FoundationSponsor",
+        # "hotfix",
+        # "plonerelease",
+        # "vulnerability",
+    ]
+
     def global_dict_hook(self, item):
+        # TODO: implement the missing types
+        if item["@type"] not in self.IMPORTED_TYPES:
+            return
+
         # drop empty creator
         item["creators"] = [i for i in item.get("creators", []) if i]
 
