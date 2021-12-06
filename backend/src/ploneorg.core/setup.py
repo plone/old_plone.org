@@ -47,13 +47,7 @@ setup(
     python_requires=">=3.8",
     install_requires=[
         "setuptools",
-        # -*- Extra requirements: -*-
-        "prettyconf",
         "plone.volto",
-        "plone.api",
-        "plone.rest",
-        "plone.restapi",
-        "plone.app.dexterity",
     ],
     extras_require={
         "test": [
@@ -61,8 +55,6 @@ setup(
             "zestreleaser.towncrier",
             "zest.releaser[recommended]",
             "plone.app.testing",
-            "plone.testing",
-            "plone.app.contenttypes",
             "plone.app.robotframework[debug]",
             "plone.restapi[test]",
             "collective.MockMailHost",

@@ -69,10 +69,24 @@ ${SENTINEL}:
 	@echo "Sentinels for the Makefile process." > ${SENTINEL}
 
 # PYTHON, VENV, PIP
-# installed?
-
+# venv and pybin
 PYTHON=python3
-ifeq (, $(shell which python ))
+VENV?=on
+ifeq ("${VENV}", "on")
+	VENV_FOLDER?=./venv
+	PYBIN=${VENV_FOLDER}/bin/
+else
+	VENV_FOLDER?=
+	ifneq ("${VENV_FOLDER}", "")
+		PYBIN=${VENV_FOLDER}/bin/
+		PYTHON=${PYBIN}python
+	else
+		PYBIN=
+	endif
+endif
+
+# installed?
+ifeq (, $(shell which $(PYTHON) ))
   $(error "PYTHON=$(PYTHON) not found in $(PATH)")
 endif
 
@@ -81,15 +95,6 @@ PYTHON_VERSION_MIN=3.7
 PYTHON_VERSION_OK=$(shell $(PYTHON) -c 'import sys; print(int(float("%d.%d"% sys.version_info[0:2]) >= float($(PYTHON_VERSION_MIN))))' )
 ifeq ($(PYTHON_VERSION_OK),0)
   $(error "Need python $(PYTHON_VERSION) >= $(PYTHON_VERSION_MIN)")
-endif
-
-VENV?=on
-ifeq ("${VENV}", "on")
-	VENV_FOLDER?=./venv
-	PYBIN=${VENV_FOLDER}/bin/
-else
-	VENV_FOLDER?=
-	PYBIN=
 endif
 
 VENV_SENTINEL=${SENTINELFOLDER}venv.sentinel
@@ -238,9 +243,9 @@ lint: lint-black lint-isort
 ##############################################################################
 # CREATE SITE
 .PHONY: create-site
-create-site: ## Create a new site from scratch
+create-site: ${INSTANCE_TARGET} ## Create a new site from scratch
 	@echo "$(OK_COLOR)Create a new site$(NO_COLOR)"
-	@${PYBIN}zconsole run instance/etc/zope.conf ./scripts/create_site.py
+	@${PYBIN}zconsole run ${INSTANCE_FOLDER}/etc/zope.conf ./scripts/create_site.py
 
 ##############################################################################
 # RUN
@@ -248,17 +253,17 @@ create-site: ## Create a new site from scratch
 .PHONY: run
 run: ${RUN_PREREQUISITES} ## run/start Plone
 	@echo "$(OK_COLOR)Run Plone$(NO_COLOR)"
-	@${PYBIN}runwsgi -v instance/etc/zope.ini
+	@${PYBIN}runwsgi -v ${INSTANCE_FOLDER}/etc/zope.ini
 
 ##############################################################################
 # CLEAN
 .PHONY: clean-venv
 clean-venv: ## remove Python virtual environment
-ifneq ("(wildcard ${VENV_FOLDER})", "")
+ifeq ("${VENV}", "on")
 	@echo "$(OK_COLOR)Remove Virtualenv.$(NO_COLOR)"
-	rm -rf ${VENV_FOLDER} ${SENTINELFOLDER}/pip*.sentinel
+	rm -rf ${VENV_FOLDER} ${SENTINELFOLDER}/pip*.sentinel ${VENV_SENTINEL}
 else:
-	@echo "$(OK_WARN)No Python virtualenv at '${VENV_FOLDER}'! Nothing to do.$(NO_COLOR)"
+	@echo "$(OK_WARN)No self-created Python virtualenv at '${VENV_FOLDER}'! Nothing to do.$(NO_COLOR)"
 endif
 
 .PHONY: clean-pyc
