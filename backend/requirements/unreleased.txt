@@ -1,3 +1,0 @@
--e git+git://github.com/collective/collective.exportimport.git#egg=collective.exportimport
-hurry.filesize==0.9
-ijson==3.1.4
