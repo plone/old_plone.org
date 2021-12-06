@@ -7,11 +7,12 @@ from pathlib import Path
 from plone import api
 from plone.protect.interfaces import IDisableCSRFProtection
 from Products.Five import BrowserView
+from Products.ZCatalog.ProgressHandler import ZLogHandler
 from zope.interface import alsoProvides
 from ZPublisher.HTTPRequest import FileUpload
 
-import os
 import json
+import os
 import transaction
 
 logger = getLogger(__name__)
@@ -57,7 +58,6 @@ class ImportAll(BrowserView):
 
         # reindex
         logger.info("Reindexing Security")
-        from Products.ZCatalog.ProgressHandler import ZLogHandler
         catalog = api.portal.get_tool('portal_catalog')
         pghandler = ZLogHandler(1000)
         catalog.reindexIndex('allowedRolesAndUsers', None, pghandler=pghandler)
@@ -77,13 +77,6 @@ class ImportAll(BrowserView):
         results = view(jsonfile=path.read_text(), return_json=True)
         logger.info(results)
         transaction.commit()
-
-        # name = "portlets"
-        # view = api.content.get_view(f"import_{name}", portal, request)
-        # path = Path(directory) / f"export_{name}.json"
-        # results = view(jsonfile=path.read_text(), return_json=True)
-        # logger.info(results)
-        # transaction.commit()
 
         name = "zope_users"
         view = api.content.get_view(f"import_{name}", portal, request)
@@ -141,9 +134,29 @@ class PloneOrgImportContent(ImportContent):
         if item["@type"] not in self.IMPORTED_TYPES:
             return
 
+        # fix error_expiration_must_be_after_effective_date
+        if item["UID"] == "0cf016d763af4615b3f06587ef5cd9f4":
+            item["effective"] = "2019-01-01T00:00:00"
+
+        # Some items may have no title or only spaces but it is a required field
+        if not item["title"] or not item["title"].strip():
+            item["title"] = item["id"]
+
         lang = item.pop("language", None)
         if lang is not None:
             item["language"] = "en"
+
+        # Missing value in primary field
+        if item["@type"] == "Image" and not item["image"]:
+            logger.info(f'No image in {item["@id"]}! Skipping...')
+            return
+        if item["@type"] == "File" and not item["file"]:
+            logger.info(f'No file in {item["@id"]}! Skipping...')
+            return
+
+        # Empty value in tuple
+        if item["@type"] == "Event" and item["attendees"]:
+            item["attendees"] = [i for i in item["attendees"] if i]
 
         # disable mosaic remote view
         if item.get("layout") == "layout_view":
@@ -199,7 +212,11 @@ class ImportZopeUsers(BrowserView):
             if not username or not password or not roles:
                 continue
             title = item.pop("title", None)
-            acl.users.addUser(username, title, password)
+            try:
+                acl.users.addUser(username, title, password)
+            except KeyError:
+                # user exists
+                pass
             for role in roles:
                 acl.roles.assignRoleToPrincipal(role, username)
             usersNumber += 1
