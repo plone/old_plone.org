@@ -11,4 +11,29 @@
     directory="static"
   />
 
+  <!-- Import stuff (for migration only) -->
+  <browser:page
+      name="import_content"
+      for="zope.interface.Interface"
+      class=".import.PloneOrgImportContent"
+      layer="ploneorg.core.interfaces.IPloneOrgCoreLayer"
+      permission="cmf.ManagePortal"
+      />
+
+  <browser:page
+      name="import_all"
+      for="zope.interface.Interface"
+      class=".import.ImportAll"
+      template="import_all.pt"
+      permission="cmf.ManagePortal"
+      />
+
+  <browser:page
+      name="import_zope_users"
+      for="zope.interface.Interface"
+      class=".import.ImportZopeUsers"
+      template="import_zope_users.pt"
+      permission="cmf.ManagePortal"
+      />
+
 </configure>

@@ -48,6 +48,7 @@ setup(
     install_requires=[
         "setuptools",
         "plone.volto",
+        "collective.exportimport",
     ],
     extras_require={
         "test": [
