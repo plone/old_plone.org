@@ -8,4 +8,4 @@ LABEL maintainer="Plone Foundation <marketing@plone.org>" \
 
 # Add local code
 COPY . ./
-RUN gosu make install
+RUN gosu make VENV=OFF VENV_FOLDER=. install
