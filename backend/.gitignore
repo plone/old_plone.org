@@ -12,6 +12,7 @@ etc/
 instance/
 htmlcov/
 node_modules/
+sources/
 src/ploneorg.core/setuphandlers/data/*.json
 .vscode/
 .tox/
