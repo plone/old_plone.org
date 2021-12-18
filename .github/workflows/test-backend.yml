@@ -36,5 +36,4 @@ jobs:
 
       - name: Run tests
         run: |
-          git config --global url."https://github.com/".insteadOf ssh://git@github.com/
           make VENV=off test-ignore-warnings
