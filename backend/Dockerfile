@@ -1,4 +1,4 @@
-FROM plone/plone-backend:6.0.0a1
+FROM plone/plone-backend:6.0.0a2
 
 LABEL maintainer="Plone Foundation <marketing@plone.org>" \
       org.label-schema.name="ploneorg-backend" \
@@ -8,4 +8,7 @@ LABEL maintainer="Plone Foundation <marketing@plone.org>" \
 
 # Add local code
 COPY . ./
-RUN gosu make VENV=OFF VENV_FOLDER=. install
+RUN apt-get update \
+    && apt-get -y upgrade -y \
+    && apt-get -y install make \
+    && make VENV=off VENV_FOLDER=. install

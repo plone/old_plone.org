@@ -15,17 +15,29 @@ MAKEFLAGS+=--no-builtin-rules
 
 # Colors
 # OK=Green, warn=yellow, error=red
-OK_COLOR=`tput setaf 2`
-WARN_COLOR=`tput setaf 3`
-ERROR_COLOR=`tput setaf 1`
-NO_COLOR=`tput sgr0`
+ifeq ($(TERM),)
+# no colors if not in terminal
+	MARK_COLOR=
+	OK_COLOR=
+	WARN_COLOR=
+	ERROR_COLOR=
+	NO_COLOR=
+else
+	MARK_COLOR=`tput setaf 6`
+	OK_COLOR=`tput setaf 2`
+	WARN_COLOR=`tput setaf 3`
+	ERROR_COLOR=`tput setaf 1`
+	NO_COLOR=`tput sgr0`
+endif
 
 ##############################################################################
 # SETTINGS AND VARIABLE
 # adjust to your project needs
-PROJEKT_NAME=backend
-IMAGE_NAME=${PROJEKT_NAME}
-CONSTRAINTS=constraints.txt
+PROJECT_NAME=ploneorg.core
+IMAGE_NAME=${PROJECT_NAME}
+CONSTRAINTS_IN=constraints.txt
+CONSTRAINTS_IN=constraints.txt
+CONSTRAINTS_MXDEV=constraints-mxdev.txt
 PIP_REQUIREMENTS_IN_FILE=requirements.txt
 ADDONBASE=./src/ploneorg.core/
 ADDONFOLDER=${ADDONBASE}src/
@@ -37,7 +49,7 @@ PIP_PARAMS= --pre --use-deprecated legacy-resolver
 ##############################################################################
 # targets and prerequisites
 # target has to be one file, otherwise step gets executes for each file separate
-PREPARE_PREREQUISITES=${PIP_REQUIREMENTS_IN_FILE} ${CONSTRAINTS} sources.ini ${ADDONBASE}setup.cfg
+PREPARE_PREREQUISITES=${PIP_REQUIREMENTS_IN_FILE} ${CONSTRAINTS_IN} sources.ini ${ADDONBASE}setup.cfg
 PREPARE_TARGET=requirements-mxdev.txt
 INSTALL_PREREQUSISTES=${PREPARE_TARGET}
 INSTALL_TARGET=.installed.txt
@@ -57,7 +69,28 @@ all:style testrun
 # And add help text after each target name starting with '\#\#'
 .PHONY: help
 help: ## This help message
+help: ## This help message
+	@echo "${OK_COLOR}This is the Makefile for ${WARN_COLOR}${PROJECT_NAME}${NO_COLOR}"
+	@echo
+	@echo "${WARN_COLOR}Additional parameters:${NO_COLOR}"
+	@echo "${MARK_COLOR}PYTHON${NO_COLOR}:       python interpreter to be used (default: python3)"
+	@echo "${MARK_COLOR}VENV${NO_COLOR}:        [on|off] wether to create a Python virtual environment or not (default: on)"
+	@echo "${MARK_COLOR}VENV_FOLDER${NO_COLOR}: location of the virtual environment (default: ./venv)"
+	@echo
+	@echo "${WARN_COLOR}Targets:${NO_COLOR}"
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+
+##############################################################################
+# targets and prerequisites
+# target has to be one file, otherwise step gets executes for each file separate
+PREPARE_PREREQUISITES=${PIP_REQUIREMENTS_IN_FILE} ${CONSTRAINTS_IN} sources.ini ${ADDONBASE}setup.cfg
+PREPARE_TARGET=requirements-mxdev.txt
+INSTALL_PREREQUSISTES=${PREPARE_TARGET}
+INSTALL_TARGET=.installed.txt
+INSTANCE_PREREQUISITES=${INSTALL_TARGET} ${INSTANCE_YAML}
+INSTANCE_TARGET=${INSTANCE_FOLDER}/etc/zope.ini ${INSTANCE_FOLDER}/etc/zope.conf ${INSTANCE_FOLDER}/etc/site.zcml
+TEST_PREREQUISITES=${INSTALL_TARGET}
+RUN_PREREQUISITES=${INSTANCE_TARGET}
 
 ##############################################################################
 # BASE
@@ -70,7 +103,7 @@ ${SENTINEL}:
 
 # PYTHON, VENV, PIP
 # venv and pybin
-PYTHON=python3
+PYTHON?=python3
 VENV?=on
 ifeq ("${VENV}", "on")
 	VENV_FOLDER?=./venv
@@ -108,9 +141,9 @@ endif
 	@touch ${VENV_SENTINEL}
 
 PIP_SENTINEL=${SENTINELFOLDER}pip.sentinel
-${PIP_SENTINEL}: ${VENV_SENTINEL} ${CONSTRAINTS} ${SENTINEL}
-	@echo "$(OK_COLOR)Install pip according to ${CONSTRAINTS}$(NO_COLOR)"
-	@${PYBIN}pip install -c ${CONSTRAINTS} pip wheel
+${PIP_SENTINEL}: ${VENV_SENTINEL} ${CONSTRAINTS_IN} ${SENTINEL}
+	@echo "$(OK_COLOR)Install pip according to ${CONSTRAINTS_IN}$(NO_COLOR)"
+	@${PYBIN}pip install -c ${CONSTRAINTS_IN} pip wheel
 	@touch ${PIP_SENTINEL}
 
 ##############################################################################
@@ -164,7 +197,7 @@ ${INSTANCE_TARGET}: ${INSTANCE_PREREQUISITES} ${COOKIECUTTER_SENTINEL}
 TESTRUNNER_SENTINEL=${SENTINELFOLDER}pip-testrunner.sentinel
 ${TESTRUNNER_SENTINEL}: ${PIP_SENTINEL}
 	@echo "$(OK_COLOR)Install zope.testrunner$(NO_COLOR)"
-	@${PYBIN}pip install zope.testrunner
+	@${PYBIN}pip install -c ${CONSTRAINTS_MXDEV} zope.testrunner
 	@touch ${TESTRUNNER_SENTINEL}
 
 .PHONY: test
@@ -181,21 +214,21 @@ test-ignore-warnings: ${TEST_PREREQUISITES} ${TESTRUNNER_SENTINEL}  ## run tests
 # CODE FORMATTING
 
 BLACK_SENTINEL=${SENTINELFOLDER}pip-black.sentinel
-${BLACK_SENTINEL}: ${PIP_SENTINEL}
+${BLACK_SENTINEL}: ${PREPARE_TARGET}
 	@echo "$(OK_COLOR)Install black$(NO_COLOR)"
-	@${PYBIN}pip install black
+	@${PYBIN}pip install -c ${CONSTRAINTS_MXDEV} black
 	@touch ${BLACK_SENTINEL}
 
 ISORT_SENTINEL=${SENTINELFOLDER}pip-isort.sentinel
-${ISORT_SENTINEL}: ${PIP_SENTINEL}
+${ISORT_SENTINEL}: ${PREPARE_TARGET}
 	@echo "$(OK_COLOR)Install isort$(NO_COLOR)"
-	@${PYBIN}pip install isort
+	@${PYBIN}pip install -c ${CONSTRAINTS_MXDEV} isort
 	@touch ${ISORT_SENTINEL}
 
 ZPRETTY_SENTINEL=${SENTINELFOLDER}pip-zpretty.sentinel
-${ZPRETTY_SENTINEL}: ${PIP_SENTINEL}
+${ZPRETTY_SENTINEL}: ${PREPARE_TARGET}
 	@echo "$(OK_COLOR)Install zpretty$(NO_COLOR)"
-	@${PYBIN}pip install zpretty
+	@${PYBIN}pip install -c ${CONSTRAINTS_MXDEV} "zpretty>=2.2.0"
 	@touch ${ZPRETTY_SENTINEL}
 
 .PHONY: apply-style-black
@@ -211,7 +244,7 @@ apply-style-isort: ${ISORT_SENTINEL} ## apply/format code style isort (sorted im
 .PHONY: apply-style-zpretty
 apply-style-zpretty: ${ZPRETTY_SENTINEL}   ## apply/format code style zpretty (to XML/ZCML files)
 	@echo "$(OK_COLOR)Apply style zpretty rules to code in ${ADDONFOLDER}/*$(NO_COLOR)"
-	@find ${ADDONFOLDER} -name '*.zcml' -exec ${PYBIN}zpretty --check -z {} +
+	@find ${ADDONFOLDER} -name '*.zcml' -exec ${PYBIN}zpretty -iz {} +
 	@find ${ADDONFOLDER} -name "*.xml"|grep -v locales|xargs ${PYBIN}zpretty -ix
 
 .PHONY: style ## apply code styles black, isort and zpretty
@@ -230,22 +263,14 @@ lint-isort: ${ISORT_SENTINEL} ## lint code-style isort (sorted imports in Python
 	@echo "$(OK_COLOR)Apply style isort rules to code in ${ADDONFOLDER}/*$(NO_COLOR)"
 	@${PYBIN}isort --check-only ${ADDONFOLDER}
 
-# waiting for a release
-# .PHONY: lint-zpretty
-# lint-zpretty: ${ZPRETTY_SENTINEL}   ## lint code-style zpretty (to XML/ZCML files)
-# 	@echo "$(OK_COLOR)Apply style zpretty rules to code in ${ADDONFOLDER}/*$(NO_COLOR)"
-# 	@find ${ADDONFOLDER} -name '*.zcml' -exec ${PYBIN}zpretty --check -z {} +
-# 	@find ${ADDONFOLDER} -name '*.xml'|grep -v locales|xargs zpretty --check -x
+.PHONY: lint-zpretty
+lint-zpretty: ${ZPRETTY_SENTINEL}   ## lint code-style zpretty (to XML/ZCML files)
+	@echo "$(OK_COLOR)Apply style zpretty rules to code in ${ADDONFOLDER}/*$(NO_COLOR)"
+	@find ${ADDONFOLDER} -name '*.zcml' -exec ${PYBIN}zpretty --check -z {} +
+	@find ${ADDONFOLDER} -name '*.xml'|grep -v locales|xargs zpretty --check -x
 
 .PHONY: lint ## lint all: check if complies with code-styles black, isort and zpretty
-lint: lint-black lint-isort
-
-##############################################################################
-# CREATE SITE
-.PHONY: create-site
-create-site: ${INSTANCE_TARGET} ## Create a new site from scratch
-	@echo "$(OK_COLOR)Create a new site$(NO_COLOR)"
-	@${PYBIN}zconsole run ${INSTANCE_FOLDER}/etc/zope.conf ./scripts/create_site.py
+lint: lint-black lint-isort lint-zpretty
 
 ##############################################################################
 # RUN
@@ -253,7 +278,7 @@ create-site: ${INSTANCE_TARGET} ## Create a new site from scratch
 .PHONY: run
 run: ${RUN_PREREQUISITES} ## run/start Plone
 	@echo "$(OK_COLOR)Run Plone$(NO_COLOR)"
-	@${PYBIN}runwsgi -v ${INSTANCE_FOLDER}/etc/zope.ini
+	@${PYBIN}runwsgi -v instance/etc/zope.ini
 
 ##############################################################################
 # CLEAN
@@ -269,8 +294,8 @@ endif
 .PHONY: clean-pyc
 clean-pyc: ## remove Python file artifacts
 	@echo "$(OK_COLOR)Remove Python file artifacts (like byte-code) of code in current directory.$(NO_COLOR)"
-	find . -name '*.pyc' -exec rm -f {} +
-	find . -name '*.pyo' -exec rm -f {} +
+	find . -name '*.py[c|o]' -delete
+	find . -name '*.mo' -delete
 	find . -name '*~' -exec rm -f {} +
 	find . -name '__pycache__' -exec rm -fr {} +
 
@@ -297,3 +322,10 @@ ifneq ("$(wildcard Dockerfile)", "")
 else
 	@echo "$(ERROR_COLOR)A 'Dockerfile' is required to build an image.$(NO_COLOR)"
 endif
+
+##############################################################################
+# CREATE SITE
+.PHONY: create-site
+create-site: ${INSTANCE_TARGET} ## Create a new site from scratch
+	@echo "$(OK_COLOR)Create a new site$(NO_COLOR)"
+	@${PYBIN}zconsole run ${INSTANCE_FOLDER}/etc/zope.conf ./scripts/create_site.py

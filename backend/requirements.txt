@@ -1,6 +1,8 @@
 -c constraints.txt
 -e src/ploneorg.core[test]
-# WSGI not included
+
+# WSGI: A system for configuration of WSGI web components in declarative .ini format.
 Paste
+
 # we want the whole package
 Plone

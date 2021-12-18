@@ -1,6 +1,6 @@
 # Information about the Makefile
 
-How to use the pip, mxdev, cookiecutter-zope-instance and make based install.
+How to use this pip, mxdev, cookiecutter-zope-instance and make based install.
 
 ## Usage
 
@@ -17,13 +17,15 @@ All options are printed with
 make help
 ```
 
+Here some of the important ones:
+
 ```text
-clean       remove instance configuration (keeps data)
-help        This help message
+run         run Plone
+prepare     prepare soures and dependencies
 install     pip install all dependencies and scripts
 instance    create configuration for an zope (plone) instance
-prepare     prepare soures and dependencies
-run         run Plone
+clean       remove instance configuration (keeps data)
+...
 ```
 
 Order for ``make run`` is: *prepare*, *install*, *instance*, *run*.
@@ -31,7 +33,24 @@ Order for ``make run`` is: *prepare*, *install*, *instance*, *run*.
 The Makefile is built to detect changes.
 At the first ``make run`` all steps are excuted.
 Subsequent calls are only starting the applicaton server in the *run* step.
-If one of the input file is changed, steps needed to take those changes into effect are executed again.
+If one of the input file is changed, steps needed to take those changes into effect are executed again.\
+
+## Python
+
+By default the command `python3` is used. By calling i.e. `make PYTHON=python3.9.8 run` this can be changed.
+
+The Makefile support different modes of Python:
+
+1. Create new virtualenv under `./venv` (default) from a global Python 3. `python3` is expected to be in the PATH.
+2. Like (1), but the `VENV_FOLDER` is passed to every *make* call: `make VENV_FOLDER=./some_folder/ install`.
+3. `make VENV=off install`: Direct usage of current configure Python 3 environment.
+   Like if one uses *pyenv* or another already activated virtual environment, or in CI if the environment is alredy isolated.
+4. Like (3), but the environment is not activated, so we need to point *make* to the location with `make VENV=off VENV_FOLDER=~/myenv/myproject_venv` or alike.
+
+**Attention:** if those paramters are used, they *must* be passed to every make call!
+Setting them as environment variables like `export VENV=off` works too.
+
+**Hint:** Edit the `Makefile` and look for `VENV?=on` (which sets the default). And `VENV_FOLDER?=` (look for the if before) and adjust to your needs.
 
 ## Files
 
@@ -42,7 +61,7 @@ They aim to ease development and deployment of *Plone 6+*
 
 `constraints.txt`
     Version pins for your project, used by *pip*.
-`INSTALL.md`
+`README_MAKE.md`
     (this file)
 `instance.yaml`
     Zope/Plone application server configuration. Used by *cookiecutter-zope-instance*
@@ -53,6 +72,9 @@ They aim to ease development and deployment of *Plone 6+*
 `sources.ini`
     *mxdev* is used to develop with sources from VCS like Git.
     If you need sources from git, add them here.
+
+`Dockerfile`
+    Minimal configuration to build an Docker image using *make* based on the official `plone-backend <https://github.com/plone/plone-backend>`_ image.
 
 ## Tools
 
