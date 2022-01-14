@@ -8,11 +8,13 @@ from plone import api
 from plone.protect.interfaces import IDisableCSRFProtection
 from Products.Five import BrowserView
 from Products.ZCatalog.ProgressHandler import ZLogHandler
+from uuid import uuid4
 from zope.interface import alsoProvides
 from ZPublisher.HTTPRequest import FileUpload
 
 import json
 import os
+import requests
 import transaction
 
 logger = getLogger(__name__)
@@ -221,3 +223,50 @@ class ImportZopeUsers(BrowserView):
                 acl.roles.assignRoleToPrincipal(role, username)
             usersNumber += 1
         return usersNumber
+
+
+class TransformRichTextToSlate(BrowserView):
+
+    service = "http://localhost:5000/html"
+
+    def __call__(self):
+
+        types_with_blocks = [
+            "Document",
+        ]
+        headers = {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+        }
+        alsoProvides(self.request, IDisableCSRFProtection)
+        for portal_type in types_with_blocks:
+            for index, brain in enumerate(api.content.find(portal_type=portal_type), start=1):
+                obj = brain.getObject()
+                text = getattr(obj.aq_base, "text")
+                text = text and text.raw and text.raw.strip()
+                if not text:
+                    continue
+                r = requests.post(self.service, headers=headers, json={"html": text})
+                r.raise_for_status()
+                slate_data = r.json()
+                logger.debug(f"Changed html to slate")
+                logger.debug(f"Html: {text}")
+                logger.debug(f"Slate: {slate_data}")
+                blocks = {}
+                uuids = []
+
+                # add title
+                uuid = str(uuid4())
+                blocks[uuid] = {"@type": "title"}
+
+                # add slate blocks
+                for block in slate_data["data"]:
+                    uuid = str(uuid4())
+                    uuids.append(uuid)
+                    blocks[uuid] = block
+                obj.blocks = blocks
+                obj.blocks_layout = {'items': uuids}
+                logger.info(f"Migrated richtext to slate: {obj.absolute_url()}")
+                obj.reindexObject(idxs=["SearchableText"])
+                if index > 10:
+                    return "Done"
