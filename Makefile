@@ -10,7 +10,6 @@ MAKEFLAGS+=--no-builtin-rules
 
 CURRENT_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
-
 # We like colors
 # From: https://coderwall.com/p/izxssa/colored-makefile-for-golang-projects
 RED=`tput setaf 1`
@@ -27,6 +26,24 @@ all: build
 help: ## This help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
+# Migration Tools
+BLOCKS_TOOL_IMAGE=plone/blocks-conversion-tool:0.3.1
+BLOCKS_TOOL_NAME=blocks-conversion-tool
+BLOCKS_TOOL_PORT=5000
+
+.PHONY: conversion-tool
+conversion-tool: ## Create conversion tool container
+	docker ps -q -a -f name=$(BLOCKS_TOOL_NAME) || docker container create --name $(BLOCKS_TOOL_NAME) -p ${BLOCKS_TOOL_PORT}:5000 $(BLOCKS_TOOL_IMAGE)
+
+.PHONY: start-conversion-tool
+start-conversion-tool: conversion-tool ## Starts blocks conversion tool
+	docker start $(BLOCKS_TOOL_NAME)
+
+.PHONY: stop-conversion-tool
+stop-conversion-tool: conversion-tool ## Stops blocks conversion tool
+	docker stop $(BLOCKS_TOOL_NAME)
+
+# Frontend
 .PHONY: install-frontend
 install-frontend:  ## Install React Frontend
 	$(MAKE) -C "./frontend/" install
@@ -39,6 +56,7 @@ build-frontend:  ## Build React Frontend
 start-frontend:  ## Start React Frontend
 	$(MAKE) -C "./frontend/" start
 
+# Backend
 .PHONY: build-backend
 build-backend:  ## Create virtualenv and install Plone
 	$(MAKE) -C "./backend/" build
@@ -51,6 +69,8 @@ create-site:  build-backend ## Create a Plone site with default content
 start-backend: ## Start Plone Backend
 	$(MAKE) -C "./backend/" start
 
+
+# Frontend + Backend
 .PHONY: install
 install:  ## Install
 	@echo "Install backend & Frontend"
