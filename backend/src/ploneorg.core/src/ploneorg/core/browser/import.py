@@ -258,6 +258,13 @@ class TransformRichTextToSlate(BrowserView):
                 # add title
                 uuid = str(uuid4())
                 blocks[uuid] = {"@type": "title"}
+                uuids.append(uuid)
+
+                # add description
+                if obj.description:
+                    uuid = str(uuid4())
+                    blocks[uuid] = {"@type": "description"}
+                    uuids.append(uuid)
 
                 # add slate blocks
                 for block in slate_data["data"]:
@@ -266,7 +273,10 @@ class TransformRichTextToSlate(BrowserView):
                     blocks[uuid] = block
                 obj.blocks = blocks
                 obj.blocks_layout = {'items': uuids}
-                logger.info(f"Migrated richtext to slate: {obj.absolute_url()}")
+                logger.debug(f"Migrated richtext to slate: {obj.absolute_url()}")
                 obj.reindexObject(idxs=["SearchableText"])
-                if index > 10:
-                    return "Done"
+                if not index % 500:
+                    logger.info(f"Commiting After {index} items...")
+                    transaction.commit()
+        logger.info(f"Migrated {index} items to slate")
+        return "DONE"
