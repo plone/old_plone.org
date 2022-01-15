@@ -22,7 +22,9 @@
   },
   "private": false,
   "workspaces": [],
-  "addons": [],
+  "addons": [
+    "volto-slate:asDefault"
+  ],
   "jest": {
     "modulePathIgnorePatterns": [
       "api"
@@ -107,7 +109,8 @@
     "node": "^12 || ^14 || ^16"
   },
   "dependencies": {
-    "@plone/volto": "14.0.0-alpha.40"
+    "@plone/volto": "14.0.0-alpha.40",
+    "volto-slate": "*"
 },
   "devDependencies": {
     "eslint-plugin-prettier": "3.1.3",
