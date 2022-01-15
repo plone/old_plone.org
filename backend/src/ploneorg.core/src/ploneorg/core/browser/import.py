@@ -230,28 +230,36 @@ class TransformRichTextToSlate(BrowserView):
     service = "http://localhost:5000/html"
 
     def __call__(self):
-
-        types_with_blocks = [
-            "Document",
-        ]
+        types_with_blocks = []
+        portal_types = api.portal.get_tool("portal_types")
+        for fti in portal_types.listTypeInfo():
+            behaviors = getattr(fti, "behaviors", [])
+            if "volto.blocks" in behaviors:
+                types_with_blocks.append(fti.id)
         headers = {
             "Accept": "application/json",
             "Content-Type": "application/json",
         }
         alsoProvides(self.request, IDisableCSRFProtection)
         for portal_type in types_with_blocks:
-            for index, brain in enumerate(api.content.find(portal_type=portal_type), start=1):
+            for index, brain in enumerate(api.content.find(portal_type=portal_type, sort_on="path"), start=1):
                 obj = brain.getObject()
                 text = getattr(obj.aq_base, "text")
                 text = text and text.raw and text.raw.strip()
                 if not text:
                     continue
+
+                # use https://github.com/plone/blocks-conversion-tool
                 r = requests.post(self.service, headers=headers, json={"html": text})
                 r.raise_for_status()
                 slate_data = r.json()
-                logger.debug(f"Changed html to slate")
-                logger.debug(f"Html: {text}")
-                logger.debug(f"Slate: {slate_data}")
+                slate_data = slate_data["data"]
+
+                # old code when I tried eea.volto.slate:
+                # from eea.volto.slate.html2slate import text_to_slate
+                # raw_data = text_to_slate(text)
+                # slate_data = [{'@type': 'slate', 'value': raw_data}]
+
                 blocks = {}
                 uuids = []
 
@@ -267,16 +275,22 @@ class TransformRichTextToSlate(BrowserView):
                     uuids.append(uuid)
 
                 # add slate blocks
-                for block in slate_data["data"]:
+                for block in slate_data:
                     uuid = str(uuid4())
                     uuids.append(uuid)
                     blocks[uuid] = block
+
                 obj.blocks = blocks
                 obj.blocks_layout = {'items': uuids}
-                logger.debug(f"Migrated richtext to slate: {obj.absolute_url()}")
+                logger.debug(f"Migrated richtext to slate for: {obj.absolute_url()}")
                 obj.reindexObject(idxs=["SearchableText"])
+
                 if not index % 500:
-                    logger.info(f"Commiting After {index} items...")
+                    logger.info(f"Commiting after {index} items...")
                     transaction.commit()
-        logger.info(f"Migrated {index} items to slate")
-        return "DONE"
+
+            msg = f"Migrated {index} {portal_type} to slate"
+            logger.info(msg)
+            api.portal.show_message(msg, request=self.request)
+
+        return self.request.response.redirect(self.context.absolute_url())
