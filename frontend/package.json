@@ -109,7 +109,7 @@
     "node": "^12 || ^14 || ^16"
   },
   "dependencies": {
-    "@plone/volto": "14.0.0-alpha.40",
+    "@plone/volto": "14.2.2",
     "volto-slate": "*"
 },
   "devDependencies": {
