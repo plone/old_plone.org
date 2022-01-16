@@ -59,7 +59,9 @@ start-frontend:  ## Start React Frontend
 # Backend
 .PHONY: build-backend
 build-backend:  ## Create virtualenv and install Plone
-	$(MAKE) -C "./backend/" build
+	$(MAKE) -C "./backend/" prepare
+	$(MAKE) -C "./backend/" install
+	$(MAKE) -C "./backend/" instance
 
 .PHONY: create-site
 create-site:  build-backend ## Create a Plone site with default content
@@ -67,7 +69,7 @@ create-site:  build-backend ## Create a Plone site with default content
 
 .PHONY: start-backend
 start-backend: ## Start Plone Backend
-	$(MAKE) -C "./backend/" start
+	$(MAKE) -C "./backend/" run
 
 
 # Frontend + Backend
