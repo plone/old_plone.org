@@ -236,7 +236,10 @@ class TransformRichTextToSlate(BrowserView):
         request = self.request
         self.service_url = request.get("service_url", "http://localhost:5000/html")
         self.purge_richtext = request.get("purge_richtext", False)
-        self.portal_types = request.get("portal_types", self.types_with_blocks())
+        self.portal_types_info = self.types_with_blocks()
+        self.portal_types = request.get("portal_types", [])
+        if isinstance(self.portal_types, str):
+            self.portal_types = [self.portal_types]
 
         fieldname = "text"
         if not self.request.form.get("form.submitted", False):
@@ -247,8 +250,7 @@ class TransformRichTextToSlate(BrowserView):
             "Content-Type": "application/json",
         }
         for portal_type in self.portal_types:
-            portal_type = portal_type["value"]
-            for index, brain in enumerate(api.content.find(portal_type=portal_type, sort_on="path"), start=1):
+            for index, brain in enumerate(api.content.find(portal_type=self.portal_types, sort_on="path"), start=1):
                 obj = brain.getObject()
                 text = getattr(obj.aq_base, fieldname)
                 if not text:

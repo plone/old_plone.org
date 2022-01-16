@@ -15,47 +15,45 @@
         <form id="migrate_to_slate" action="@@migrate_to_slate" tal:attributes="action request/URL" method="post" enctype="multipart/form-data">
 
             <div class="field mb-3">
-              <label for="portal_type">
+              <label for="portal_types" class="form-label">
                 <span i18n:translate="">Content Types to handle</span>
               </label>
-              <div class="widget" id="portal_type">
-                <tal:types tal:repeat="ptype python: view.portal_types">
+              <tal:types tal:repeat="ptype python: view.portal_types_info">
+                <div class="form-check">
                   <input type="checkbox"
-                         name="portal_type"
-                         class="checkboxType"
-                         tal:attributes="value ptype/value; id ptype/value;">
-                  <label tal:attributes="for ptype/value"
+                         name="portal_types"
+                         class="form-check-input"
+                         tal:attributes="value ptype/value; id ptype/value;
+                                         checked python: ptype['value'] in view.portal_types">
+                  <label class="form-check-label"
+                         tal:attributes="for ptype/value"
                          tal:content="string:${ptype/title} - ${ptype/value} (${ptype/number})"></label>
-                         <br />
-                </tal:types>
-              </div>
+                </div>
+              </tal:types>
             </div>
 
             <div class="field mb-3">
-              <label for="service_url">URL of blocks-conversion-tool</label>
-                <span class="formHelp">
-                  The migration requires a service to run. See https://github.com/plone/blocks-conversion-tool for details.
-                </span>
-              <div class="widget">
-                <input type="text" name="service_url" id="service_url" value=""
-                       tal:attributes="value python:view.service_url">
-              </div>
+              <label for="service_url" class="form-label">
+                URL of blocks-conversion-tool. The migration requires a service to run. See https://github.com/plone/blocks-conversion-tool for details.
+              </label>
+              <input class="form-control" type="text" name="service_url" id="service_url" value=""
+                     tal:attributes="value python:view.service_url">
             </div>
 
-            <div class="field">
-              <label>
+            <div class="form-check">
                 <input
+                    class="form-check-input"
                     type="checkbox"
                     name="purge_richtext:boolean"
                     id="purge_richtext"
+                    value=""
                     tal:attributes="checked python:view.purge_richtext"
                     />
-                Purge Richtext.
-                <span class="formHelp">
-                  Empty Richtext-fields after migrating to Slate
-                </span>
+              <label class="form-check-label" for="purge_richtext">
+                Purge Richtext-fields after migrating to Slate
               </label>
             </div>
+
 
             <div class="formControls" class="form-group">
                 <input type="hidden" name="form.submitted" value="1"/>
