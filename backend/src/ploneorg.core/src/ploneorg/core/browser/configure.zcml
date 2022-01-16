@@ -40,6 +40,7 @@
       name="migrate_to_slate"
       for="zope.interface.Interface"
       class=".import.TransformRichTextToSlate"
+      template="migrate_to_slate.pt"
       permission="cmf.ManagePortal"
       />
 

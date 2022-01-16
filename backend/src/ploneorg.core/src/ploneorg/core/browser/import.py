@@ -5,12 +5,15 @@ from collective.exportimport.import_content import ImportContent
 from logging import getLogger
 from pathlib import Path
 from plone import api
+from plone.app.textfield.value import RichTextValue
 from plone.protect.interfaces import IDisableCSRFProtection
 from Products.Five import BrowserView
 from Products.ZCatalog.ProgressHandler import ZLogHandler
 from uuid import uuid4
+from zope.i18n import translate
 from zope.interface import alsoProvides
 from ZPublisher.HTTPRequest import FileUpload
+from operator import itemgetter
 
 import json
 import os
@@ -230,35 +233,36 @@ class TransformRichTextToSlate(BrowserView):
     service = "http://localhost:5000/html"
 
     def __call__(self):
-        types_with_blocks = []
-        portal_types = api.portal.get_tool("portal_types")
-        for fti in portal_types.listTypeInfo():
-            behaviors = getattr(fti, "behaviors", [])
-            if "volto.blocks" in behaviors:
-                types_with_blocks.append(fti.id)
+        request = self.request
+        self.service_url = request.get("service_url", "http://localhost:5000/html")
+        self.purge_richtext = request.get("purge_richtext", False)
+        self.portal_types = request.get("portal_types", self.types_with_blocks())
+
+        fieldname = "text"
+        if not self.request.form.get("form.submitted", False):
+            return self.index()
+
         headers = {
             "Accept": "application/json",
             "Content-Type": "application/json",
         }
-        alsoProvides(self.request, IDisableCSRFProtection)
-        for portal_type in types_with_blocks:
+        for portal_type in self.portal_types:
+            portal_type = portal_type["value"]
             for index, brain in enumerate(api.content.find(portal_type=portal_type, sort_on="path"), start=1):
                 obj = brain.getObject()
-                text = getattr(obj.aq_base, "text")
-                text = text and text.raw and text.raw.strip()
+                text = getattr(obj.aq_base, fieldname)
                 if not text:
+                    continue
+                if isinstance(text, RichTextValue):
+                    text = text.raw
+                if not text.strip():
                     continue
 
                 # use https://github.com/plone/blocks-conversion-tool
-                r = requests.post(self.service, headers=headers, json={"html": text})
+                r = requests.post(self.service_url, headers=headers, json={"html": text})
                 r.raise_for_status()
                 slate_data = r.json()
                 slate_data = slate_data["data"]
-
-                # old code when I tried eea.volto.slate:
-                # from eea.volto.slate.html2slate import text_to_slate
-                # raw_data = text_to_slate(text)
-                # slate_data = [{'@type': 'slate', 'value': raw_data}]
 
                 blocks = {}
                 uuids = []
@@ -282,10 +286,15 @@ class TransformRichTextToSlate(BrowserView):
 
                 obj.blocks = blocks
                 obj.blocks_layout = {'items': uuids}
-                logger.debug(f"Migrated richtext to slate for: {obj.absolute_url()}")
-                obj.reindexObject(idxs=["SearchableText"])
+                obj._p_changed = True
 
-                if not index % 500:
+                if self.purge_richtext:
+                    setattr(obj, fieldname, None)
+
+                obj.reindexObject(idxs=["SearchableText"])
+                logger.debug(f"Migrated richtext to slate for: {obj.absolute_url()}")
+
+                if not index % 1000:
                     logger.info(f"Commiting after {index} items...")
                     transaction.commit()
 
@@ -294,3 +303,25 @@ class TransformRichTextToSlate(BrowserView):
             api.portal.show_message(msg, request=self.request)
 
         return self.request.response.redirect(self.context.absolute_url())
+
+    def types_with_blocks(self):
+        """A list with info on all content types with existing items."""
+        catalog = api.portal.get_tool("portal_catalog")
+        portal_types = api.portal.get_tool("portal_types")
+        results = []
+        for fti in portal_types.listTypeInfo():
+            behaviors = getattr(fti, "behaviors", [])
+            if "volto.blocks" not in behaviors:
+                continue
+            number = len(catalog.unrestrictedSearchResults(portal_type=fti.id))
+            if number >= 1:
+                results.append(
+                    {
+                        "number": number,
+                        "value": fti.id,
+                        "title": translate(
+                            fti.title, domain="plone", context=self.request
+                        ),
+                    }
+                )
+        return sorted(results, key=itemgetter("title"))
