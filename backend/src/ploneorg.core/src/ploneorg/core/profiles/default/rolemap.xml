@@ -4,8 +4,10 @@
     <permission acquire="False"
                 name="ploneorg.core: Add Foundation Member"
     />
-    <permission name="Add Plone Release" acquire="True">
-        <role name="Manager" />
+    <permission acquire="True"
+                name="Add Plone Release"
+    >
+      <role name="Manager" />
     </permission>
     <permission acquire="True"
                 name="ploneorg.core: View Foundation Member Details"

@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
-import datetime
-
 # from collective.z3cform.datagridfield import DictRow
 # from collective.z3cform.datagridfield.datagridfield import DataGridFieldFactory
 from plone.app.content.interfaces import INameFromTitle
 from plone.app.textfield import RichText
-from plone.dexterity.content import Item
 from plone.autoform import directives
+from plone.dexterity.content import Item
 from plone.i18n.normalizer.interfaces import IUserPreferredURLNormalizer
 from plone.supermodel.model import Schema
 from ploneorg.core import _
@@ -17,73 +15,70 @@ from zope.interface import alsoProvides
 from zope.interface import implementer
 from zope.publisher.interfaces.http import IHTTPRequest
 
+import datetime
+
 
 # TODO: Replace datagridfield with something that works in Volto
 class IReleaseUpload(Schema):
-    """ File download link for a Plone release
-    """
-    description = schema.TextLine(
-        title=_(u'Description'),
-        required=False
-    )
+    """File download link for a Plone release"""
+
+    description = schema.TextLine(title=_("Description"), required=False)
     platform = schema.Choice(
-        title=_(u'Platform'),
-        vocabulary = platform_vocabulary,
-        required=False
+        title=_("Platform"), vocabulary=platform_vocabulary, required=False
     )
-    url = schema.TextLine(
-        title=_(u'URL'),
-        required=False
-    )
-    file_size = schema.TextLine(
-        title=_(u'File size'),
-        required=False
-    )
+    url = schema.TextLine(title=_("URL"), required=False)
+    file_size = schema.TextLine(title=_("File size"), required=False)
 
 
 class IPloneRelease(Schema):
-    """ A Plone release """
+    """A Plone release"""
 
-    version = schema.TextLine(
-        title=_(u'Version'),
-        required=True
-    )
+    version = schema.TextLine(title=_("Version"), required=True)
     description = schema.Text(
-        title=_(u"Description"),
+        title=_("Description"),
         required=False,
     )
     release_date = schema.Date(
-        title=_(u'Release date'),
-        required=False,
-        default=datetime.date.today()
+        title=_("Release date"), required=False, default=datetime.date.today()
     )
     release_notes = RichText(
-        title=_(u'Release notes'),
-        default_mime_type='text/html',
-        output_mime_type='text/html',
-        allowed_mime_types=('text/plain', 'text/html', 'text/restructured', 'text/x-web-markdown'),
+        title=_("Release notes"),
+        default_mime_type="text/html",
+        output_mime_type="text/html",
+        allowed_mime_types=(
+            "text/plain",
+            "text/html",
+            "text/restructured",
+            "text/x-web-markdown",
+        ),
         required=False,
     )
     changelog = RichText(
-        title=_(u"Changelog"),
-        default_mime_type='text/restructured',
-        output_mime_type='text/html',
-        allowed_mime_types=('text/plain', 'text/html', 'text/restructured', 'text/x-web-markdown'),
+        title=_("Changelog"),
+        default_mime_type="text/restructured",
+        output_mime_type="text/html",
+        allowed_mime_types=(
+            "text/plain",
+            "text/html",
+            "text/restructured",
+            "text/x-web-markdown",
+        ),
         required=False,
     )
 
     # directives.widget(files=DataGridFieldFactory)
     files = schema.List(
-        title=_(u'Files'),
+        title=_("Files"),
         # value_type=DictRow(title=_(u'Uploads'), schema=IReleaseUpload),
         value_type=schema.TextLine(),
-        required=False
+        required=False,
     )
 
 
 @implementer(IPloneRelease)
 class PloneRelease(Item):
     """ """
+
     @property
     def title(self):
         return "Plone %s" % self.version
@@ -94,12 +89,11 @@ class PloneRelease(Item):
 
 class INameFromVersion(INameFromTitle):
     def title():
-        """ Return the version number"""
+        """Return the version number"""
 
 
 @implementer(INameFromVersion)
 class NameFromVersion(object):
-
     def __init__(self, context):
         self.context = context
         request = getattr(context, "REQUEST", None)
@@ -115,7 +109,7 @@ class NameFromVersion(object):
 
 class IChooseMyOwnDamnName(IHTTPRequest):
     """We need to be able to adapt the request for PloneRelease objects to
-       get to our own IUserPreferredURLNormalizer.
+    get to our own IUserPreferredURLNormalizer.
     """
 
 

@@ -6,8 +6,8 @@
   <object meta_type="Dexterity FTI"
           name="FoundationMember"
   />
-  <object name="plonerelease"
-          meta_type="Dexterity FTI"
+  <object meta_type="Dexterity FTI"
+          name="plonerelease"
   />
   <!-- Disable Collection -->
   <object meta_type="Dexterity FTI"
