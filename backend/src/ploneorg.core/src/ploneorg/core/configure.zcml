@@ -22,7 +22,6 @@
 
   <!-- -*- extra stuff goes here -*- -->
 
-  <include package=".vocabularies" />
   <include package=".behaviors" />
   <include package=".browser" />
   <include package=".serializers" />

@@ -130,7 +130,7 @@ class PloneOrgImportContent(ImportContent):
         # "FoundationMember",
         # "FoundationSponsor",
         "hotfix",
-        # "plonerelease",
+        "plonerelease",
         "vulnerability",
     ]
 

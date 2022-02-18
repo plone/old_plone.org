@@ -49,6 +49,7 @@ setup(
         "setuptools",
         "plone.volto",
         "collective.exportimport",
+        "pycountry",
     ],
     extras_require={
         "test": [

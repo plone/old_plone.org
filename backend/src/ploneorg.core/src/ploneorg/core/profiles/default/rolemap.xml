@@ -5,5 +5,8 @@
     <permission acquire="False"
                 name="ploneorg.core: Add Foundation Member"
     />
+    <permission name="Add Plone Release" acquire="True">
+        <role name="Manager" />
+    </permission>
   </permissions>
 </rolemap>
