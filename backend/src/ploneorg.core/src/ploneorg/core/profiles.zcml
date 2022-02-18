@@ -6,16 +6,16 @@
 
   <genericsetup:registerProfile
       name="default"
-      title="Plone Conference: Site Setup"
-      description="Policy package to install Plone Conference site"
+      title="ploneorg.core: Site Setup"
+      description="Policy package for plone.org"
       provides="Products.GenericSetup.interfaces.EXTENSION"
       directory="profiles/default"
       />
 
   <genericsetup:registerProfile
       name="initial"
-      title="Plone Conference: Initial content"
-      description="Initial content for ploneorg.org website."
+      title="ploneorg.core: Initial content"
+      description="Initial content for plone.org website."
       provides="Products.GenericSetup.interfaces.EXTENSION"
       directory="profiles/initial"
       pre_handler=".setuphandlers.populate_portal"
@@ -23,8 +23,8 @@
 
   <genericsetup:registerProfile
       name="uninstall"
-      title="Plone Conference: Uninstall"
-      description="Uninstall Plone Conference setup."
+      title="ploneorg.core: Uninstall"
+      description="."
       provides="Products.GenericSetup.interfaces.EXTENSION"
       directory="profiles/uninstall"
       />
