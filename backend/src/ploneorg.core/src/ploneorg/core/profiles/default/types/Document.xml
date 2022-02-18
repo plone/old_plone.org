@@ -5,6 +5,7 @@
   <property name="behaviors"
             purge="false"
   >
+    <element value="plone.constraintypes" />
     <element value="plone.richtext" />
   </property>
 </object>
