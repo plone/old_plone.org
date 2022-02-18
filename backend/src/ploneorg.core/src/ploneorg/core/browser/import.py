@@ -129,9 +129,9 @@ class PloneOrgImportContent(ImportContent):
         "News Item",
         # "FoundationMember",
         # "FoundationSponsor",
-        # "hotfix",
+        "hotfix",
         # "plonerelease",
-        # "vulnerability",
+        "vulnerability",
     ]
 
     def global_dict_hook(self, item):
@@ -144,7 +144,7 @@ class PloneOrgImportContent(ImportContent):
             item["effective"] = "2019-01-01T00:00:00"
 
         # Some items may have no title or only spaces but it is a required field
-        if not item["title"] or not item["title"].strip():
+        if not item.get("title") or not item.get("title", "").strip():
             item["title"] = item["id"]
 
         lang = item.pop("language", None)
@@ -170,6 +170,9 @@ class PloneOrgImportContent(ImportContent):
 
         # drop empty creator
         item["creators"] = [i for i in item.get("creators", []) if i]
+
+        if item["@type"] == "vulnerability":
+            item["reported_by"] = [i for i in item.get("reported_by", []) or [] if i]
 
         return item
 
