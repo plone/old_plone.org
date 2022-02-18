@@ -70,6 +70,10 @@
         "Editor"
       ]
     },
+    "_allowed_types": [
+      "Document",
+      "FoundationMember"
+    ],
     "exclude_from_nav": false
   }
 ]

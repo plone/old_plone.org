@@ -68,6 +68,7 @@ def _create_content(portal, item: dict, creators: list):
     if allowed_types:
         behavior = ISelectableConstrainTypes(content)
         behavior.setConstrainTypesMode(constrains.ENABLED)
+        behavior.setLocallyAllowedTypes(allowed_types)
         behavior.setImmediatelyAddableTypes(allowed_types)
     if modified:
         content.modification_date = modified
