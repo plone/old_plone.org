@@ -67,11 +67,57 @@
       "ploneorg.core: Add Foundation Member": [
         "Site Manager",
         "Manager",
-        "Editor"
+        "Editor",
+        "Reviewer",
+        "Contributor"
       ]
     },
     "_allowed_types": [
       "Document",
+      "FoundationMember"
+    ],
+    "exclude_from_nav": false
+  },
+  {
+    "_parent": "foundation/members",
+    "type": "Document",
+    "id": "applications",
+    "title": "Apply to be a Foundation Member",
+    "description": "Join us.",
+    "blocks": {
+      "45cec973-d436-46ca-8545-35300ffbcb91": {
+        "@type": "title"
+      }
+    },
+    "blocks_layout": {
+      "items": [
+        "45cec973-d436-46ca-8545-35300ffbcb91"
+      ]
+    },
+    "_transitions": [
+      "publish"
+    ],
+    "_permissions": {
+      "Add portal content": [
+        "Site Manager",
+        "Manager",
+        "Editor",
+        "Reviewer",
+        "Contributor",
+        "Member",
+        "Authenticated"
+      ],
+      "ploneorg.core: Add Foundation Member": [
+        "Site Manager",
+        "Manager",
+        "Editor",
+        "Reviewer",
+        "Contributor",
+        "Member",
+        "Authenticated"
+      ]
+    },
+    "_allowed_types": [
       "FoundationMember"
     ],
     "exclude_from_nav": false

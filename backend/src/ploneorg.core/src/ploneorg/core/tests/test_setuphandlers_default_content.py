@@ -109,3 +109,8 @@ class TestFoundationMembersArea(unittest.TestCase):
                 "FoundationMember",
             ]
             self.assertEqual(behavior.getImmediatelyAddableTypes(), allowed_types)
+
+    def test_chidren(self):
+        """Test content is published."""
+        children_ids = self.content.objectIds()
+        self.assertIn("applications", children_ids)

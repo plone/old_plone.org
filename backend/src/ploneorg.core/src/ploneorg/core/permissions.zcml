@@ -10,9 +10,12 @@
         title="ploneorg.core: Add Foundation Member"
         />
     <permission
+        id="ploneorg.core.ViewFoundationMemberDetails"
+        title="ploneorg.core: View Foundation Member Details"
+        />
+    <permission
         id="ploneorg.core.plonerelease.add"
         title="Add Plone Release"
         />
   </configure>
-
 </configure>

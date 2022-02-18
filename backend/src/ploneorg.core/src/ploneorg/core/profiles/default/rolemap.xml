@@ -1,12 +1,18 @@
 <?xml version="1.0"?>
 <rolemap>
   <permissions>
-    <!-- -*- extra stuff goes here -*- -->
     <permission acquire="False"
                 name="ploneorg.core: Add Foundation Member"
     />
     <permission name="Add Plone Release" acquire="True">
         <role name="Manager" />
+    </permission>
+    <permission acquire="True"
+                name="ploneorg.core: View Foundation Member Details"
+    >
+      <role name="Manager" />
+      <role name="Editor" />
+      <role name="Owner" />
     </permission>
   </permissions>
 </rolemap>
