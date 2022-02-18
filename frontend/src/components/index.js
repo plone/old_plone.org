@@ -8,3 +8,7 @@
  *   Footer,
  * };
  */
+import HotfixView from './Views/Hotfix';
+import VulnerabilityView from './Views/Vulnerability';
+
+export { VulnerabilityView, HotfixView };
