@@ -1,7 +1,13 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<object name="portal_types" meta_type="Plone Types Tool">
+<object meta_type="Plone Types Tool"
+        name="portal_types"
+>
   <!-- Our Content types -->
-  <object name="FoundationMember" meta_type="Dexterity FTI"/>
+  <object meta_type="Dexterity FTI"
+          name="FoundationMember"
+  />
   <!-- Disable Collection -->
-  <object name="Collection" meta_type="Dexterity FTI"/>
+  <object meta_type="Dexterity FTI"
+          name="Collection"
+  />
 </object>

@@ -1,13 +1,19 @@
 <?xml version="1.0"?>
-<registry
-    xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-    i18n:domain="ploneorg.core">
+<registry xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+          i18n:domain="ploneorg.core"
+>
 
-  <record name="plone.site_title" interface="Products.CMFPlone.interfaces.controlpanel.ISiteSchema" field="site_title">
+  <record field="site_title"
+          interface="Products.CMFPlone.interfaces.controlpanel.ISiteSchema"
+          name="plone.site_title"
+  >
     <value>Plone CMS: Open Source Content Management</value>
   </record>
 
-  <record name="plone.types_not_searched" interface="Products.CMFPlone.interfaces.controlpanel.ISearchSchema" field="types_not_searched">
+  <record field="types_not_searched"
+          interface="Products.CMFPlone.interfaces.controlpanel.ISearchSchema"
+          name="plone.types_not_searched"
+  >
     <value>
       <element>Discussion Item</element>
       <element>Image</element>
@@ -17,7 +23,10 @@
     </value>
   </record>
 
-  <record name="plone.displayed_types" interface="Products.CMFPlone.interfaces.controlpanel.INavigationSchema" field="displayed_types">
+  <record field="displayed_types"
+          interface="Products.CMFPlone.interfaces.controlpanel.INavigationSchema"
+          name="plone.displayed_types"
+  >
     <value>
       <element>Document</element>
       <element>Folder</element>
