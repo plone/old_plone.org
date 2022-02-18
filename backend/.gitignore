@@ -19,7 +19,6 @@ src/ploneorg.core/setuphandlers/data/*.json
 __pycache__
 reports/
 # files
-*-mxdev.txt
 log.html
 output.xml
 pip-selfcheck.json
@@ -28,3 +27,8 @@ report.html
 # excludes
 inituser
 pip-wheel-metadata
+
+# mxdev
+*-mxdev.txt
+constraints-dev.txt
+requirements-dev.txt
