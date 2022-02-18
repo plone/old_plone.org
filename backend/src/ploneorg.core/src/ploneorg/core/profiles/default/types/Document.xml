@@ -1,6 +1,10 @@
 <?xml version="1.0"?>
-<object name="Document" meta_type="Dexterity FTI">
-  <property name="behaviors" purge="false">
+<object meta_type="Dexterity FTI"
+        name="Document"
+>
+  <property name="behaviors"
+            purge="false"
+  >
     <element value="plone.richtext" />
   </property>
 </object>

@@ -3,6 +3,7 @@ from collective.exportimport.fix_html import fix_html_in_content_fields
 from collective.exportimport.fix_html import fix_html_in_portlets
 from collective.exportimport.import_content import ImportContent
 from logging import getLogger
+from operator import itemgetter
 from pathlib import Path
 from plone import api
 from plone.app.textfield.value import RichTextValue
@@ -13,18 +14,17 @@ from uuid import uuid4
 from zope.i18n import translate
 from zope.interface import alsoProvides
 from ZPublisher.HTTPRequest import FileUpload
-from operator import itemgetter
 
 import json
 import os
 import requests
 import transaction
 
+
 logger = getLogger(__name__)
 
 
 class ImportAll(BrowserView):
-
     def __call__(self, prepare=True):
         request = self.request
         portal = api.portal.get()
@@ -63,9 +63,9 @@ class ImportAll(BrowserView):
 
         # reindex
         logger.info("Reindexing Security")
-        catalog = api.portal.get_tool('portal_catalog')
+        catalog = api.portal.get_tool("portal_catalog")
         pghandler = ZLogHandler(1000)
-        catalog.reindexIndex('allowedRolesAndUsers', None, pghandler=pghandler)
+        catalog.reindexIndex("allowedRolesAndUsers", None, pghandler=pghandler)
         logger.info("Finished Reindexing Security")
         transaction.commit()
 
@@ -178,7 +178,6 @@ class PloneOrgImportContent(ImportContent):
 
 
 class ImportZopeUsers(BrowserView):
-
     def __call__(self, jsonfile=None, return_json=False):
         if jsonfile:
             self.portal = api.portal.get()
@@ -195,12 +194,12 @@ class ImportZopeUsers(BrowserView):
                 status = "error"
                 logger.error(e)
                 api.portal.show_message(
-                    u"Failure while uploading: {}".format(e),
+                    "Failure while uploading: {}".format(e),
                     request=self.request,
                 )
             else:
                 members = self.import_members(data)
-                msg = u"Imported {} members".format(members)
+                msg = "Imported {} members".format(members)
                 api.portal.show_message(msg, self.request)
             if return_json:
                 msg = {"state": status, "msg": msg}
@@ -253,7 +252,9 @@ class TransformRichTextToSlate(BrowserView):
             "Content-Type": "application/json",
         }
         for portal_type in self.portal_types:
-            for index, brain in enumerate(api.content.find(portal_type=self.portal_types, sort_on="path"), start=1):
+            for index, brain in enumerate(
+                api.content.find(portal_type=self.portal_types, sort_on="path"), start=1
+            ):
                 obj = brain.getObject()
                 text = getattr(obj.aq_base, fieldname)
                 if not text:
@@ -264,7 +265,9 @@ class TransformRichTextToSlate(BrowserView):
                     continue
 
                 # use https://github.com/plone/blocks-conversion-tool
-                r = requests.post(self.service_url, headers=headers, json={"html": text})
+                r = requests.post(
+                    self.service_url, headers=headers, json={"html": text}
+                )
                 r.raise_for_status()
                 slate_data = r.json()
                 slate_data = slate_data["data"]
@@ -290,7 +293,7 @@ class TransformRichTextToSlate(BrowserView):
                     blocks[uuid] = block
 
                 obj.blocks = blocks
-                obj.blocks_layout = {'items': uuids}
+                obj.blocks_layout = {"items": uuids}
                 obj._p_changed = True
 
                 if self.purge_richtext:

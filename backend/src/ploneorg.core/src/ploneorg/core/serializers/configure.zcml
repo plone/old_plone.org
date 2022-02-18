@@ -4,6 +4,6 @@
   <utility
       factory=".summary.JSONSummarySerializerMetadata"
       name="ploneorg.core.summary_serializer_metadata"
-  />
+      />
 
 </configure>

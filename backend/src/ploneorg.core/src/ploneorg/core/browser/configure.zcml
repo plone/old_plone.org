@@ -1,23 +1,24 @@
 <configure
-  xmlns="http://namespaces.zope.org/zope"
-  xmlns:browser="http://namespaces.zope.org/browser"
-  xmlns:plone="http://namespaces.plone.org/plone"
-  i18n_domain="ploneorg.core">
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    xmlns:plone="http://namespaces.plone.org/plone"
+    i18n_domain="ploneorg.core"
+    >
 
   <!-- Publish static files -->
   <plone:static
-    name="ploneorg.core"
-    type="plone"
-    directory="static"
-  />
+      directory="static"
+      name="ploneorg.core"
+      type="plone"
+      />
 
   <!-- Import stuff (for migration only) -->
   <browser:page
       name="import_content"
       for="zope.interface.Interface"
       class=".import.PloneOrgImportContent"
-      layer="ploneorg.core.interfaces.IPloneOrgCoreLayer"
       permission="cmf.ManagePortal"
+      layer="ploneorg.core.interfaces.IPloneOrgCoreLayer"
       />
 
   <browser:page
