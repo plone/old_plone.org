@@ -24,6 +24,26 @@ import transaction
 
 logger = getLogger(__name__)
 
+PORTAL_TYPE_MAPPING = {
+    # "FormFolder": "EasyForm",
+}
+
+ALLOWED_TYPES = [
+    "Collection",
+    "Document",
+    "Event",
+    "File",
+    "Folder",
+    "Image",
+    "Link",
+    "News Item",
+    "FoundationMember",
+    # "FoundationSponsor",
+    "hotfix",
+    "plonerelease",
+    "vulnerability",
+]
+
 
 class ImportAll(BrowserView):
     def __call__(self, prepare=True):
@@ -119,25 +139,9 @@ class PloneOrgImportContent(ImportContent):
 
     DROP_UIDS = []
 
-    IMPORTED_TYPES = [
-        "Collection",
-        "Document",
-        "Event",
-        "File",
-        "Folder",
-        "Image",
-        "Link",
-        "News Item",
-        "FoundationMember",
-        # "FoundationSponsor",
-        "hotfix",
-        "plonerelease",
-        "vulnerability",
-    ]
-
     def global_dict_hook(self, item):
         # TODO: implement the missing types
-        if item["@type"] not in self.IMPORTED_TYPES:
+        if item["@type"] not in ALLOWED_TYPES:
             return
 
         # fix error_expiration_must_be_after_effective_date
@@ -174,6 +178,24 @@ class PloneOrgImportContent(ImportContent):
 
         if item["@type"] == "vulnerability":
             item["reported_by"] = [i for i in item.get("reported_by", []) or [] if i]
+
+        # update constraints
+        if item.get("exportimport.constrains"):
+            types_fixed = []
+            for portal_type in item["exportimport.constrains"]["locally_allowed_types"]:
+                if portal_type in PORTAL_TYPE_MAPPING:
+                    types_fixed.append(PORTAL_TYPE_MAPPING[portal_type])
+                elif portal_type in ALLOWED_TYPES:
+                    types_fixed.append(portal_type)
+            item["exportimport.constrains"]["locally_allowed_types"] = list(set(types_fixed))
+
+            types_fixed = []
+            for portal_type in item["exportimport.constrains"]["immediately_addable_types"]:
+                if portal_type in PORTAL_TYPE_MAPPING:
+                    types_fixed.append(PORTAL_TYPE_MAPPING[portal_type])
+                elif portal_type in ALLOWED_TYPES:
+                    types_fixed.append(portal_type)
+            item["exportimport.constrains"]["immediately_addable_types"] = list(set(types_fixed))
 
         return item
 
