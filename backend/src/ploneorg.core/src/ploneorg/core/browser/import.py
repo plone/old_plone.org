@@ -174,6 +174,14 @@ class PloneOrgImportContent(ImportContent):
         if item["@type"] == "vulnerability":
             item["reported_by"] = [i for i in item.get("reported_by", []) or [] if i]
 
+        # TODO: transfer data to a better format?
+        if item["@type"] == "plonerelease":
+            fileinfos = item.get("files", [])
+            item["files"] = []
+            for fileinfo in fileinfos:
+                value = f"{fileinfo['description']} ({fileinfo['file_size']}, {fileinfo['platform']}): {fileinfo['url']}"
+                item["files"].append(value)
+
         return item
 
 
