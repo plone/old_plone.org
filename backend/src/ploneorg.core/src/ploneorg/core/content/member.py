@@ -51,7 +51,7 @@ class IFoundationMember(model.Schema):
     directives.read_permission(address="ploneorg.core.ViewFoundationMemberDetails")
     address = schema.TextLine(title=_("Address"), required=True)
     city = schema.TextLine(title=_("City"), required=True)
-    state = schema.TextLine(title=_("State"), required=True)
+    state = schema.TextLine(title=_("State"), required=False)
 
     directives.read_permission(postal_code="ploneorg.core.ViewFoundationMemberDetails")
     postal_code = schema.TextLine(title=_("Postal code"), required=True)

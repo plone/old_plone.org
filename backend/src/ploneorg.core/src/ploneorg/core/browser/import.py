@@ -1,4 +1,5 @@
 from App.config import getConfiguration
+from bs4 import BeautifulSoup
 from collective.exportimport.fix_html import fix_html_in_content_fields
 from collective.exportimport.fix_html import fix_html_in_portlets
 from collective.exportimport.import_content import ImportContent
@@ -127,7 +128,7 @@ class PloneOrgImportContent(ImportContent):
         "Image",
         "Link",
         "News Item",
-        # "FoundationMember",
+        "FoundationMember",
         # "FoundationSponsor",
         "hotfix",
         "plonerelease",
@@ -174,14 +175,32 @@ class PloneOrgImportContent(ImportContent):
         if item["@type"] == "vulnerability":
             item["reported_by"] = [i for i in item.get("reported_by", []) or [] if i]
 
-        # TODO: transfer data to a better format?
-        if item["@type"] == "plonerelease":
-            fileinfos = item.get("files", [])
-            item["files"] = []
-            for fileinfo in fileinfos:
-                value = f"{fileinfo['description']} ({fileinfo['file_size']}, {fileinfo['platform']}): {fileinfo['url']}"
-                item["files"].append(value)
+        return item
 
+    def dict_hook_plonerelease(self, item):
+        # TODO: transfer data to a better format?
+        fileinfos = item.get("files", [])
+        item["files"] = []
+        for fileinfo in fileinfos:
+            value = f"{fileinfo['description']} ({fileinfo['file_size']}, {fileinfo['platform']}): {fileinfo['url']}"
+            item["files"].append(value)
+        return item
+
+    def dict_hook_foundationmember(self, item):
+        firstname = item.pop("fname", "")
+        lastname = item.pop("lname", "")
+        item["title"] = f"{firstname} {lastname}".strip()
+
+        # append ploneuse to main text
+        ploneuse = item["ploneuse"] and item["ploneuse"]["data"] or ""
+        soup = BeautifulSoup(ploneuse, "html.parser")
+        if soup.text.strip() and "no data (carried over from old site)" not in soup.text:
+            merit = item["merit"]["data"]
+            ploneuse = item["ploneuse"]["data"]
+            item["merit"]["data"] = f"{merit} \r\n {ploneuse}"
+
+        # TODO: Fix workflow
+        item["review_state"] = "published"
         return item
 
 
