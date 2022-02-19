@@ -18,7 +18,7 @@ jobs:
           - "3.8"
           - "3.9"
         plone:
-          - "6.0.0a2"
+          - "6.0.0a3"
 
     steps:
       - uses: actions/checkout@v2
