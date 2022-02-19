@@ -302,7 +302,7 @@ class TransformRichTextToSlate(BrowserView):
         }
         for portal_type in self.portal_types:
             for index, brain in enumerate(
-                api.content.find(portal_type=self.portal_types, sort_on="path"), start=1
+                api.content.find(portal_type=portal_type, sort_on="path"), start=1
             ):
                 obj = brain.getObject()
                 text = getattr(obj.aq_base, fieldname)
