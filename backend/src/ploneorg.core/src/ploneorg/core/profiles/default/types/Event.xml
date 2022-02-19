@@ -1,8 +1,7 @@
 <?xml version="1.0"?>
 <object meta_type="Dexterity FTI"
-        name="Collection"
+        name="Event"
 >
-  <property name="global_allow">True</property>
   <property name="behaviors"
             purge="false"
   >
