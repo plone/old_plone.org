@@ -60,6 +60,7 @@ setup(
             "plone.app.robotframework[debug]",
             "plone.restapi[test]",
             "collective.MockMailHost",
+            "pas.plugins.authomatic",
         ],
     },
     entry_points="""
