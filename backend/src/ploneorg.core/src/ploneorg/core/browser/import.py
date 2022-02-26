@@ -12,6 +12,7 @@ from plone.protect.interfaces import IDisableCSRFProtection
 from Products.Five import BrowserView
 from Products.ZCatalog.ProgressHandler import ZLogHandler
 from uuid import uuid4
+from zope.annotation.interfaces import IAnnotations
 from zope.i18n import translate
 from zope.interface import alsoProvides
 from ZPublisher.HTTPRequest import FileUpload
@@ -97,12 +98,12 @@ class ImportAll(BrowserView):
         logger.info(results)
         transaction.commit()
 
-        name = "defaultpages"
-        view = api.content.get_view(f"import_{name}", portal, request)
-        path = Path(directory) / f"export_{name}.json"
-        results = view(jsonfile=path.read_text(), return_json=True)
-        logger.info(results)
-        transaction.commit()
+        # name = "defaultpages"
+        # view = api.content.get_view(f"import_{name}", portal, request)
+        # path = Path(directory) / f"export_{name}.json"
+        # results = view(jsonfile=path.read_text(), return_json=True)
+        # logger.info(results)
+        # transaction.commit()
 
         name = "zope_users"
         view = api.content.get_view(f"import_{name}", portal, request)
@@ -208,6 +209,14 @@ class PloneOrgImportContent(ImportContent):
             item["files"].append(value)
         return item
 
+    def dict_hook_collection(self, item):
+        # Replace Collections with Documents with a listing block
+        item["@type"] = "Document"
+        # transform query to listing block with the same query
+        item["exportimport.collection.query"] = item.pop("query")
+        item["exportimport.collection.layout"] = item.pop("layout")
+        return item
+
     def dict_hook_foundationmember(self, item):
         firstname = item.pop("fname", "")
         lastname = item.pop("lname", "")
@@ -224,6 +233,13 @@ class PloneOrgImportContent(ImportContent):
         # TODO: Fix workflow
         item["review_state"] = "published"
         return item
+
+    def obj_hook_document(self, obj, item):
+        if item.get("exportimport.collection.query"):
+            # Store collection query for later transform to listing block
+            annotations = IAnnotations(obj)
+            annotations["exportimport.collection.query"] = item["exportimport.collection.query"]
+            annotations["exportimport.collection.layout"] = item.get("exportimport.collection.layout")
 
 
 class ImportZopeUsers(BrowserView):
