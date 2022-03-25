@@ -49,8 +49,8 @@ class IFoundationMember(model.Schema):
 
     # Contact information
     directives.read_permission(address="ploneorg.core.ViewFoundationMemberDetails")
-    address = schema.TextLine(title=_("Address"), required=True)
-    city = schema.TextLine(title=_("City"), required=True)
+    address = schema.TextLine(title=_("Address"), required=False)
+    city = schema.TextLine(title=_("City"), required=False)
     state = schema.TextLine(title=_("State"), required=False)
 
     directives.read_permission(postal_code="ploneorg.core.ViewFoundationMemberDetails")
@@ -59,7 +59,7 @@ class IFoundationMember(model.Schema):
     country = schema.Choice(
         title=_("Country"),
         vocabulary="ploneorg.core.vocabulary.countries",
-        required=True,
+        required=False,
         missing_value="",
     )
 
