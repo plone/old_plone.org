@@ -19,6 +19,7 @@ from ZPublisher.HTTPRequest import FileUpload
 
 import json
 import os
+import pycountry
 import requests
 import transaction
 
@@ -39,7 +40,7 @@ ALLOWED_TYPES = [
     "Link",
     "News Item",
     "FoundationMember",
-    # "FoundationSponsor",
+    "FoundationSponsor",
     "hotfix",
     "plonerelease",
     "vulnerability",
@@ -229,6 +230,22 @@ class PloneOrgImportContent(ImportContent):
             merit = item["merit"]["data"]
             ploneuse = item["ploneuse"]["data"]
             item["merit"]["data"] = f"{merit} \r\n {ploneuse}"
+
+        # TODO: Fix workflow
+        item["review_state"] = "published"
+        return item
+
+    def dict_hook_foundationsponsor(self, item):
+        # fix amount to be float
+        if item.get("payment_amount"):
+            item["payment_amount"] = float(item["payment_amount"])
+        else:
+            item["payment_amount"] = 0.0
+
+        # fix country to work with vocabulary
+        if item.get("country"):
+            country = pycountry.countries.get(alpha_3=item["country"]["token"])
+            item["country"] = country.alpha_2
 
         # TODO: Fix workflow
         item["review_state"] = "published"
