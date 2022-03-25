@@ -9,6 +9,9 @@
   <object meta_type="Dexterity FTI"
           name="plonerelease"
   />
+  <object meta_type="Dexterity FTI"
+          name="FoundationSponsor"
+  />
   <!-- Disable Collection -->
   <object meta_type="Dexterity FTI"
           name="Collection"

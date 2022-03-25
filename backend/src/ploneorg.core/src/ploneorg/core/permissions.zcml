@@ -14,6 +14,10 @@
         title="ploneorg.core: View Foundation Member Details"
         />
     <permission
+        id="ploneorg.core.foundationsponsor.add"
+        title="ploneorg.core: Add Foundation Sponsor"
+        />
+    <permission
         id="ploneorg.core.plonerelease.add"
         title="Add Plone Release"
         />
