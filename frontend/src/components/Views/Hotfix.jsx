@@ -1,12 +1,12 @@
 import React from 'react';
 import { DefaultView } from '@plone/volto/components';
 
-const HotfixView = props => {
+const HotfixView = (props) => {
   return (
     <>
-    <DefaultView {...props} />;
+      <DefaultView {...props} />;
     </>
-  )
+  );
 };
 
 export default HotfixView;
