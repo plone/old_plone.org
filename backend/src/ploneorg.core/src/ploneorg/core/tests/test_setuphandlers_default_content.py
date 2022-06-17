@@ -20,7 +20,7 @@ class TestImageFolder(unittest.TestCase):
 
     def test_is_created(self):
         """Test if /images is created."""
-        self.assertEqual(self.content.portal_type, "Folder")
+        self.assertEqual(self.content.portal_type, "Document")
 
     def test_exclude_from_nav(self):
         """Test exclude_from_nav is set to True."""

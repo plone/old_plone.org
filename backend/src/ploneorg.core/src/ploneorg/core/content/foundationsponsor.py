@@ -3,18 +3,23 @@ from plone.app.dexterity import _ as _PMF
 from plone.app.textfield import RichText
 from plone.autoform.directives import read_permission
 from plone.dexterity.content import Item
+from plone.namedfile.field import NamedBlobImage
+from plone.rfc822.interfaces import IPrimaryField
 from plone.supermodel.directives import fieldset
 from plone.supermodel.model import Schema
 from ploneorg.core import _
-from ploneorg.core.vocabularies import payment_frequency_vocabulary, payment_method_vocabulary, \
-    sponsorship_type_vocabulary, org_size_vocabulary, payment_currency_vocabulary
+from ploneorg.core.vocabularies import org_size_vocabulary
+from ploneorg.core.vocabularies import payment_currency_vocabulary
+from ploneorg.core.vocabularies import payment_frequency_vocabulary
+from ploneorg.core.vocabularies import payment_method_vocabulary
+from ploneorg.core.vocabularies import sponsorship_type_vocabulary
 from zope import schema
-from zope.interface import implementer, alsoProvides
-from plone.namedfile.field import NamedBlobImage
+from zope.interface import alsoProvides
+from zope.interface import implementer
 from zope.interface import Invalid
-from plone.rfc822.interfaces import IPrimaryField
 
 import re
+
 
 # TODO: add workflow state Waiting for Initial Payment
 # TODO: display effective and expiry date in view template
@@ -26,18 +31,20 @@ import re
 # TODO: enable commenting/discussion instead of commenting with change comments?
 
 # email re w/o leading '^'
-EMAIL_RE = "([0-9a-zA-Z_&.'+-]+!)*[0-9a-zA-Z_&.'+-]+@(([0-9a-zA-Z]([0-9a-zA-Z-]*[0-9a-z-A-Z])?\.)+[a-zA-Z]{2,}|([0-9]{1,3}\.){3}[0-9]{1,3})$"
+EMAIL_RE = "([0-9a-zA-Z_&.'+-]+!)*[0-9a-zA-Z_&.'+-]+@(([0-9a-zA-Z]([0-9a-zA-Z-]*[0-9a-z-A-Z])?\.)+[a-zA-Z]{2,}|([0-9]{1,3}\.){3}[0-9]{1,3})$"  # noQA
+
 
 def isEmail(value):
-     prog = re.compile('^'+EMAIL_RE)
-     result = prog.match(value)
-     if result is None:
-         raise Invalid(_PMF(u'is not a valid email address.'))
-     return True
+    prog = re.compile("^" + EMAIL_RE)
+    result = prog.match(value)
+    if result is None:
+        raise Invalid(_PMF("is not a valid email address."))
+    return True
+
 
 def isHTTP(value):
-    if not value.startswith('http://') and not value.startswith('https://'):
-        raise Invalid(_PMF(u'web address must start with http:// or https://'))
+    if not value.startswith("http://") and not value.startswith("https://"):
+        raise Invalid(_PMF("web address must start with http:// or https://"))
     return True
 
 
@@ -45,253 +52,234 @@ class IFoundationSponsor(Schema):
     """A Foundation sponsor"""
 
     fieldset(
-        'Contacts',
-        label=u'Contacts',
+        "Contacts",
+        label="Contacts",
         fields=[
-            'fname',
-            'lname',
-            'email',
-            'alt_fname',
-            'alt_lname',
-            'alt_email',
-        ]
+            "fname",
+            "lname",
+            "email",
+            "alt_fname",
+            "alt_lname",
+            "alt_email",
+        ],
     )
 
     fieldset(
-        'Address',
-        label=u'Address',
+        "Address",
+        label="Address",
         fields=[
-            'address',
-            'address2',
-            'city',
-            'state',
-            'postalCode',
-            'country',
-        ]
+            "address",
+            "address2",
+            "city",
+            "state",
+            "postalCode",
+            "country",
+        ],
     )
 
     fieldset(
-        'Payment',
-        label=u'Payment',
+        "Payment",
+        label="Payment",
         fields=[
-            'payment_frequency',
-            'payment_method',
-            'payment_amount',
-            'payment_currency',
-            'payment_date',
-        ]
+            "payment_frequency",
+            "payment_method",
+            "payment_amount",
+            "payment_currency",
+            "payment_date",
+        ],
     )
 
     fieldset(
-        'Status',
-        label=u'Status',
+        "Status",
+        label="Status",
         fields=[
-            'start_date',
-            'end_date',
-            'last_verified_date',
-            'notes',
-        ]
+            "start_date",
+            "end_date",
+            "last_verified_date",
+            "notes",
+        ],
     )
 
     org_name = schema.TextLine(
-        title=_PMF(u'Organization name', default=u'Organization name'),
-        required=True
+        title=_PMF("Organization name", default="Organization name"), required=True
     )
 
     logo = NamedBlobImage(
-        title=_(u"Logo"),
+        title=_("Logo"),
         required=False,
     )
 
     sponsorship_type = schema.Choice(
-        title=_PMF(u'Sponsor Type', default=u'Sponsor Type'),
+        title=_PMF("Sponsor Type", default="Sponsor Type"),
         vocabulary=sponsorship_type_vocabulary,
         required=True,
     )
 
-    read_permission(orgsize='ploneorg.core.foundationsponsor.view')
+    read_permission(orgsize="ploneorg.core.foundationsponsor.view")
     orgsize = schema.Choice(
-        title=_(u'Organization size'),
-        description=_(
-            u'Number of people in your organization. It\'s fine to estimate.'),
+        title=_("Organization size"),
+        description=_("Number of people in your organization. It's fine to estimate."),
         vocabulary=org_size_vocabulary,
         required=True,
     )
 
     is_provider = schema.Bool(
-        title=_PMF(u'Is a Plone provider', default=u'Is a Plone provider'),
+        title=_PMF("Is a Plone provider", default="Is a Plone provider"),
     )
 
     website = schema.URI(
-        title=_PMF(u'Web Site', default=u'Web Site'),
-        description=_(u'Enter a http:// or https:// web address'),
+        title=_PMF("Web Site", default="Web Site"),
+        description=_("Enter a http:// or https:// web address"),
         required=False,
         constraint=isHTTP,
     )
 
     provider_listing_url = schema.URI(
-        title=_PMF(u'Plone.com provider listing', default=u'Plone.com provider listing'),
-        description=_(u'Enter a http:// or https:// web address'),
+        title=_PMF("Plone.com provider listing", default="Plone.com provider listing"),
+        description=_("Enter a http:// or https:// web address"),
         required=False,
         constraint=isHTTP,
     )
 
-    read_permission(fname='ploneorg.core.foundationsponsor.view')
+    read_permission(fname="ploneorg.core.foundationsponsor.view")
     fname = schema.TextLine(
-        title=_PMF(u'Contact first name', default=u'Contact first name'),
-        required=True
+        title=_PMF("Contact first name", default="Contact first name"), required=True
     )
 
-    read_permission(lname='ploneorg.core.foundationsponsor.view')
+    read_permission(lname="ploneorg.core.foundationsponsor.view")
     lname = schema.TextLine(
-        title=_PMF(u'Contact last name', default=u'Contact last name'),
-        required=True
+        title=_PMF("Contact last name", default="Contact last name"), required=True
     )
 
-    read_permission(email='ploneorg.core.foundationsponsor.view')
+    read_permission(email="ploneorg.core.foundationsponsor.view")
     email = schema.TextLine(
-        title=_PMF(u'Email', default=u'Email'),
-        constraint=isEmail,
-        required=True
+        title=_PMF("Email", default="Email"), constraint=isEmail, required=True
     )
 
-    read_permission(address='ploneorg.core.foundationsponsor.view')
-    address = schema.TextLine(
-        title=_PMF(u'Address', default=u'Address'),
-        required=False
-    )
+    read_permission(address="ploneorg.core.foundationsponsor.view")
+    address = schema.TextLine(title=_PMF("Address", default="Address"), required=False)
 
-    read_permission(address2='ploneorg.core.foundationsponsor.view')
+    read_permission(address2="ploneorg.core.foundationsponsor.view")
     address2 = schema.TextLine(
-        title=_PMF(u'Address 2', default=u'Address 2'),
-        required=False
+        title=_PMF("Address 2", default="Address 2"), required=False
     )
 
-    city = schema.TextLine(
-        title=_PMF(u'City', default=u'City'),
-        required=True
-    )
+    city = schema.TextLine(title=_PMF("City", default="City"), required=True)
 
-    read_permission(state='ploneorg.core.foundationsponsor.view')
-    state = schema.TextLine(
-        title=_PMF(u'State', default=u'State'),
-        required=False
-    )
+    read_permission(state="ploneorg.core.foundationsponsor.view")
+    state = schema.TextLine(title=_PMF("State", default="State"), required=False)
 
-    read_permission(postalCode='ploneorg.core.foundationsponsor.view')
+    read_permission(postalCode="ploneorg.core.foundationsponsor.view")
     postalCode = schema.TextLine(
-        title=_PMF(u'Postal code', default=u'Postal code'),
-        required=False
+        title=_PMF("Postal code", default="Postal code"), required=False
     )
 
     country = schema.Choice(
-        title=_PMF(u'Country', default=u'Country'),
+        title=_PMF("Country", default="Country"),
         vocabulary="ploneorg.core.vocabulary.countries",
-        default='USA',
-        required=True
+        default="USA",
+        required=True,
     )
 
-    read_permission(alt_fname='ploneorg.core.foundationsponsor.view')
+    read_permission(alt_fname="ploneorg.core.foundationsponsor.view")
     alt_fname = schema.TextLine(
-        title=_PMF(u'Alternate contact first name', default=u'Alternate contact first name'),
-        required=False
+        title=_PMF(
+            "Alternate contact first name", default="Alternate contact first name"
+        ),
+        required=False,
     )
 
-    read_permission(alt_lname='ploneorg.core.foundationsponsor.view')
+    read_permission(alt_lname="ploneorg.core.foundationsponsor.view")
     alt_lname = schema.TextLine(
-        title=_PMF(u'Alternate contact last name', default=u'Alternate contact last name'),
-        required=False
+        title=_PMF(
+            "Alternate contact last name", default="Alternate contact last name"
+        ),
+        required=False,
     )
 
-    read_permission(alt_email='ploneorg.core.foundationsponsor.view')
+    read_permission(alt_email="ploneorg.core.foundationsponsor.view")
     alt_email = schema.TextLine(
-        title=_PMF(u'Alternate email', default=u'Alternate email'),
+        title=_PMF("Alternate email", default="Alternate email"),
         constraint=isEmail,
-        required=False
+        required=False,
     )
 
     twitter = schema.TextLine(
-        title=_PMF(u'Twitter account', default=u'Twitter account'),
-        description=_PMF(u'(without the leading ''@'')', default=u'(without the leading ''@'')'),
-        required=False
+        title=_PMF("Twitter account", default="Twitter account"),
+        description=_PMF(
+            "(without the leading " "@" ")", default="(without the leading " "@" ")"
+        ),
+        required=False,
     )
 
-    read_permission(connection_to_plone='ploneorg.core.foundationsponsor.view')
+    read_permission(connection_to_plone="ploneorg.core.foundationsponsor.view")
     connection_to_plone = RichText(
-        title=_PMF(u'Connection to Plone', default=u'Connection to Plone'),
-        description=_(u'What is your connection to Plone? How is Plone used by your organization?'),
-        required=False
+        title=_PMF("Connection to Plone", default="Connection to Plone"),
+        description=_(
+            "What is your connection to Plone? How is Plone used by your organization?"
+        ),
+        required=False,
     )
 
-    read_permission(payment_frequency='ploneorg.core.foundationsponsor.view')
+    read_permission(payment_frequency="ploneorg.core.foundationsponsor.view")
     payment_frequency = schema.Choice(
-        title=_PMF(u'Payment frequency', default=u'Payment frequency'),
+        title=_PMF("Payment frequency", default="Payment frequency"),
         vocabulary=payment_frequency_vocabulary,
     )
 
-    read_permission(payment_method='ploneorg.core.foundationsponsor.view')
+    read_permission(payment_method="ploneorg.core.foundationsponsor.view")
     payment_method = schema.Choice(
-        title=_PMF(u'Payment method', default=u'Payment method'),
+        title=_PMF("Payment method", default="Payment method"),
         vocabulary=payment_method_vocabulary,
-        default='PayPal',
-        required=True
+        default="PayPal",
+        required=True,
     )
 
-    read_permission(payment_amount='ploneorg.core.foundationsponsor.view')
+    read_permission(payment_amount="ploneorg.core.foundationsponsor.view")
     payment_amount = schema.Float(
-        title=_PMF(u'Payment Amount', default=u'Payment Amount'),
-        min=0.0,
-        required=True
+        title=_PMF("Payment Amount", default="Payment Amount"), min=0.0, required=True
     )
 
-    read_permission(payment_currency='ploneorg.core.foundationsponsor.view')
+    read_permission(payment_currency="ploneorg.core.foundationsponsor.view")
     payment_currency = schema.Choice(
-        title=_PMF(u'Currency', default=u'Currency'),
+        title=_PMF("Currency", default="Currency"),
         vocabulary=payment_currency_vocabulary,
-        default='USD',
-        required=True
+        default="USD",
+        required=True,
     )
 
     start_date = schema.Date(
-        title=_PMF(u'Start Date', default=u'Start Date'),
-        required=False
+        title=_PMF("Start Date", default="Start Date"), required=False
     )
 
-    end_date = schema.Date(
-        title=_PMF(u'End Date', default=u'End Date'),
-        required=False
-    )
+    end_date = schema.Date(title=_PMF("End Date", default="End Date"), required=False)
 
-    read_permission(payment_date='ploneorg.core.foundationsponsor.view')
+    read_permission(payment_date="ploneorg.core.foundationsponsor.view")
     payment_date = schema.Date(
-        title=_PMF(u'Payment Date', default=u'Payment Date'),
-        required=False
+        title=_PMF("Payment Date", default="Payment Date"), required=False
     )
 
-    read_permission(last_verified_date='ploneorg.core.foundationsponsor.view')
+    read_permission(last_verified_date="ploneorg.core.foundationsponsor.view")
     last_verified_date = schema.Date(
-        title=_PMF(u'Status last verified date', default=u'Status last verified date'),
-        required=False
+        title=_PMF("Status last verified date", default="Status last verified date"),
+        required=False,
     )
 
-    read_permission(notes='ploneorg.core.foundationsponsor.view')
+    read_permission(notes="ploneorg.core.foundationsponsor.view")
     notes = RichText(
-        title=_PMF(u'Private notes', default=u'Private notes'),
-        required=False
+        title=_PMF("Private notes", default="Private notes"), required=False
     )
 
     public_notes = RichText(
-        title=_PMF(u'Public notes', default=u'Public notes'),
-        required=False
+        title=_PMF("Public notes", default="Public notes"), required=False
     )
 
 
-alsoProvides(IFoundationSponsor['logo'], IPrimaryField)
+alsoProvides(IFoundationSponsor["logo"], IPrimaryField)
 
 
 @implementer(IFoundationSponsor)
 class FoundationSponsor(Item):
-
     @property
     def title(self):
         return self.org_name
@@ -305,22 +293,25 @@ class FoundationSponsor(Item):
             self.fname,
             self.lname,
         ]
-        return u' '.join([name for name in names if name])
+        return " ".join([name for name in names if name])
 
-    def toXML(self, schematas=['contact', 'survey']):
-        """To XML for Paul ;) """
+    def toXML(self, schematas=["contact", "survey"]):
+        """To XML for Paul ;)"""
 
-        out = ''
+        out = ""
         out += '<foundationsponsor id="%s">' % self.getId()
-        fields = [f for f in self.Schema().fields()
-                  if (f.schemata in schematas) and f.getName() != 'id']
+        fields = [
+            f
+            for f in self.Schema().fields()
+            if (f.schemata in schematas) and f.getName() != "id"
+        ]
         for f in fields:
-            out += '<%s>%s</%s>' % (
+            out += "<%s>%s</%s>" % (
                 f.getName(),
                 getattr(self, f.accessor)(),
-                f.getName()
+                f.getName(),
             )
-        out += '</foundationsponsor>'
+        out += "</foundationsponsor>"
         return out
 
 
@@ -331,11 +322,9 @@ class INameFromPersonNames(INameFromTitle):
 
 @implementer(INameFromPersonNames)
 class NameFromPersonNames(object):
-
     def __init__(self, context):
         self.context = context
 
     @property
     def title(self):
         return self.context.org_name
-

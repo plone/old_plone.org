@@ -1,9 +1,5 @@
-# -*- coding: utf-8 -*-
-# from collective.z3cform.datagridfield import DictRow
-# from collective.z3cform.datagridfield.datagridfield import DataGridFieldFactory
 from plone.app.content.interfaces import INameFromTitle
 from plone.app.textfield import RichText
-from plone.autoform import directives
 from plone.dexterity.content import Item
 from plone.i18n.normalizer.interfaces import IUserPreferredURLNormalizer
 from plone.supermodel.model import Schema
