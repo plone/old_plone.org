@@ -21,6 +21,7 @@
     "stylelint:overrides": "stylelint 'theme/**/*.overrides' 'src/**/*.overrides'",
     "stylelint:fix": "yarn stylelint --fix && yarn stylelint:overrides --fix",
     "test": "razzle test --env=jest-environment-jsdom-sixteen --passWithNoTests",
+    "test:ci": "CI=true razzle test --env=jest-environment-jsdom-sixteen --passWithNoTests",
     "test:husky": "CI=true yarn test --bail --findRelatedTests",
     "cypress:run": "NODE_ENV=test cypress run",
     "cypress:open": "NODE_ENV=test cypress open",
