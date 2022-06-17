@@ -3,6 +3,7 @@ name: Test the frontend code
 on:
   push:
     paths:
+      - ".github/workflows/frontend.yml"
       - "frontend/**"
 
 env:

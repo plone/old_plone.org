@@ -3,6 +3,7 @@ name: Test the Backend code
 on:
   push:
     paths:
+      - ".github/workflows/backend.yml"
       - "backend/**"
 
 jobs:
@@ -93,11 +94,11 @@ jobs:
 
       - name: Install package
         run: |
-          make VENV=off install
+          pip install -e "src/ploneorg.core[test]"
 
       - name: Run tests
         run: |
-          make VENV=off test-ignore-warnings
+          PYTHONWARNINGS=ignore zope-testrunner --auto-color --auto-progress --test-path src/ploneorg.core/src/
 
   release:
     runs-on: ubuntu-latest
