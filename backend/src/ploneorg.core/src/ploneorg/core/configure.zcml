@@ -16,6 +16,8 @@
       />
   <include package="plone.volto" />
   <include package="plone.restapi" />
+  <include package="plone.app.vulnerabilities" />
+  <include package="pas.plugins.authomatic" />
 
   <include file="permissions.zcml" />
   <include file="profiles.zcml" />

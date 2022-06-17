@@ -184,15 +184,21 @@ class PloneOrgImportContent(ImportContent):
                     types_fixed.append(PORTAL_TYPE_MAPPING[portal_type])
                 elif portal_type in ALLOWED_TYPES:
                     types_fixed.append(portal_type)
-            item["exportimport.constrains"]["locally_allowed_types"] = list(set(types_fixed))
+            item["exportimport.constrains"]["locally_allowed_types"] = list(
+                set(types_fixed)
+            )
 
             types_fixed = []
-            for portal_type in item["exportimport.constrains"]["immediately_addable_types"]:
+            for portal_type in item["exportimport.constrains"][
+                "immediately_addable_types"
+            ]:
                 if portal_type in PORTAL_TYPE_MAPPING:
                     types_fixed.append(PORTAL_TYPE_MAPPING[portal_type])
                 elif portal_type in ALLOWED_TYPES:
                     types_fixed.append(portal_type)
-            item["exportimport.constrains"]["immediately_addable_types"] = list(set(types_fixed))
+            item["exportimport.constrains"]["immediately_addable_types"] = list(
+                set(types_fixed)
+            )
 
         return item
 
@@ -201,7 +207,11 @@ class PloneOrgImportContent(ImportContent):
         fileinfos = item.get("files", [])
         item["files"] = []
         for fileinfo in fileinfos:
-            value = f"{fileinfo['description']} ({fileinfo['file_size']}, {fileinfo['platform']}): {fileinfo['url']}"
+            value = (
+                f"{fileinfo['description']} "
+                f"({fileinfo['file_size']}, "
+                f"{fileinfo['platform']}): {fileinfo['url']}"
+            )
             item["files"].append(value)
         return item
 
@@ -221,7 +231,8 @@ class PloneOrgImportContent(ImportContent):
         # append ploneuse to main text
         ploneuse = item["ploneuse"] and item["ploneuse"]["data"] or ""
         soup = BeautifulSoup(ploneuse, "html.parser")
-        if soup.text.strip() and "no data (carried over from old site)" not in soup.text:
+        text = soup.text.strip()
+        if text and "no data (carried over from old site)" not in text:
             merit = item["merit"]["data"]
             ploneuse = item["ploneuse"]["data"]
             item["merit"]["data"] = f"{merit} \r\n {ploneuse}"
@@ -250,8 +261,12 @@ class PloneOrgImportContent(ImportContent):
         if item.get("exportimport.collection.query"):
             # Store collection query for later transform to listing block
             annotations = IAnnotations(obj)
-            annotations["exportimport.collection.query"] = item["exportimport.collection.query"]
-            annotations["exportimport.collection.layout"] = item.get("exportimport.collection.layout")
+            annotations["exportimport.collection.query"] = item[
+                "exportimport.collection.query"
+            ]
+            annotations["exportimport.collection.layout"] = item.get(
+                "exportimport.collection.layout"
+            )
 
 
 class ImportZopeUsers(BrowserView):
@@ -267,7 +282,7 @@ class ImportZopeUsers(BrowserView):
                     data = json.loads(jsonfile.read())
                 else:
                     raise ("Data is neither text nor upload.")
-            except Exception as e:
+            except Exception as e:  # noQA
                 status = "error"
                 logger.error(e)
                 api.portal.show_message(

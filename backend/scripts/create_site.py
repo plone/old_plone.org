@@ -6,11 +6,15 @@ from Testing.makerequest import makerequest
 from zope.interface import directlyProvidedBy
 from zope.interface import directlyProvides
 
+import logging
 import os
 import transaction
 
 
-truthy = frozenset(('t', 'true', 'y', 'yes', 'on', '1'))
+logger = logging.getLogger("ploneorg.core")
+logger.setLevel(logging.DEBUG)
+
+truthy = frozenset(("t", "true", "y", "yes", "on", "1"))
 
 
 def asbool(s):
@@ -27,7 +31,7 @@ def asbool(s):
 
 DELETE_EXISTING = asbool(os.getenv("DELETE_EXISTING"))
 
-app = makerequest(app)
+app = makerequest(app)  # noQA
 
 request = app.REQUEST
 
@@ -65,5 +69,5 @@ if SITE_ID not in app.objectIds():
     transaction.commit()
     app._p_jar.sync()
 else:
-    print(f"Site {SITE_ID} already created")
-    print("Set DELETE_EXISTING=true to delete it and create a new one")
+    logger.info(f"Site {SITE_ID} already created")
+    logger.info("Set DELETE_EXISTING=true to delete it and create a new one")

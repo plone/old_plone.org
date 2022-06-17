@@ -1,5 +1,4 @@
 """Installer for the ploneorg.core package."""
-
 from setuptools import find_packages
 from setuptools import setup
 
@@ -47,20 +46,19 @@ setup(
     python_requires=">=3.8",
     install_requires=[
         "setuptools",
+        "Plone",
         "plone.volto",
+        "plone.app.vulnerabilities",
         "collective.exportimport",
+        "pas.plugins.authomatic>=1.0b2",
         "pycountry",
     ],
     extras_require={
         "test": [
-            "towncrier",
-            "zestreleaser.towncrier",
             "zest.releaser[recommended]",
-            "plone.app.testing",
-            "plone.app.robotframework[debug]",
+            "plone.app.testing[robot]>=7.0.0a3",
             "plone.restapi[test]",
             "collective.MockMailHost",
-            "pas.plugins.authomatic",
         ],
     },
     entry_points="""

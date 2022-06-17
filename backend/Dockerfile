@@ -1,14 +1,14 @@
-FROM plone/plone-backend:6.0.0a2
+ARG PLONE_VERSION=6.0.0a4
+FROM plone/plone-backend:${PLONE_VERSION}
 
 LABEL maintainer="Plone Foundation <marketing@plone.org>" \
       org.label-schema.name="ploneorg-backend" \
       org.label-schema.description="Plone.org Backend." \
-      org.label-schema.vendor="Plone Foundation" \
-      org.label-schema.docker.cmd="docker run -d -p 8080:8080 plone/ploneorg-backend:latest"
+      org.label-schema.vendor="Plone Foundation"
 
 # Add local code
-COPY . ./
-RUN apt-get update \
-    && apt-get -y upgrade -y \
-    && apt-get -y install make \
-    && make VENV=off VENV_FOLDER=. install
+COPY . .
+
+# Install local requirements and fix permissions
+RUN ./bin/pip install -r requirements.txt \
+    && chown -R plone: /app

@@ -5,30 +5,40 @@
 *.py?
 *.swp
 # dirs
-venv/
-.make-sentinels/
+bin/
+buildout-cache/
 data/*.json
+develop-eggs/
+eggs/
 etc/
-instance/
 htmlcov/
+include/
+instance/
+lib/
+lib64/
+local/
 node_modules/
-sources/
-src/ploneorg.core/setuphandlers/data/*.json
-.vscode/
-.tox/
-__pycache__
-reports/
+parts/
+dist/*
+test.plone_addon/
+var/
 # files
+.installed.cfg
+.mr.developer.cfg
+lib64
 log.html
 output.xml
 pip-selfcheck.json
 report.html
-.installed.txt
+.vscode/
+.tox/
+reports/
+venv/
 # excludes
+live.cfg
 inituser
 pip-wheel-metadata
+pyvenv.cfg
 
-# mxdev
-*-mxdev.txt
-constraints-dev.txt
-requirements-dev.txt
+src/*
+!src/ploneorg.core

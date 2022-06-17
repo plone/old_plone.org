@@ -1,4 +1,3 @@
-from plone.app.content.interfaces import INameFromTitle
 from plone.app.textfield import RichText
 from plone.autoform import directives
 from plone.dexterity.content import Container

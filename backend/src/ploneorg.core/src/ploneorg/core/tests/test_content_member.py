@@ -51,7 +51,7 @@ class TestFoundationMember(unittest.TestCase):
         }
 
     def test_cannot_create_outside_container(self):
-        """Test a manager cannot create a FoundationMember outside /foundation/members."""
+        """Test a manager cannot create a Member outside /foundation/members."""
         payload = self._payload()
         payload["container"] = self.portal
         with api.env.adopt_roles(
@@ -122,7 +122,7 @@ class TestFoundationMemberFunctional(unittest.TestCase):
             "address": "Calle Córdoba, 42",
             "city": "Córdoba",
             "state": "Córdoba",
-            "country": "ARG",
+            "country": "AR",
             "postal_code": "12345",
             "merit": "Just a space pilot",
             "github": "holden-space",
