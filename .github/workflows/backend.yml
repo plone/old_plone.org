@@ -94,7 +94,7 @@ jobs:
 
       - name: Install package
         run: |
-          pip install -e "src/ploneorg.core[test]"
+          pip install -r requirements/dev.txt
 
       - name: Run tests
         run: |
