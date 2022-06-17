@@ -1,0 +1,4 @@
+-e git+https://github.com/plone/plone.restapi@master#egg=plone.restapi
+-e git+https://github.com/plone/plone.volto@main#egg=plone.volto
+-e git+https://github.com/collective/collective.exportimport@main#egg=collective.exportimport
+-e git+https://github.com/plone/plone.app.vulnerabilities@plone6#egg=plone.app.vulnerabilities
